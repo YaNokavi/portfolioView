@@ -1,0 +1,88 @@
+.widget {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  /* overflow: hidden нужен, чтобы спарклайн не вылезал за границы скругленных углов */
+  overflow: hidden;
+}
+
+.content {
+  /* Z-index нужен, чтобы контент был поверх фонового графика */
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.coinHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+
+  .coinIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #14f195; /* Пока захардкодим цвет Соланы */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #0f172a;
+    font-size: 12px;
+  }
+
+  .coinName {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f8fafc;
+  }
+
+  .coinSymbol {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+  }
+}
+
+.stats {
+  margin-top: auto;
+  padding-bottom: 8px;
+
+  .percentage {
+    font-size: 32px;
+    font-weight: 700;
+    color: #34d399; /* emerald-400 */
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .subtext {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+}
+
+.sparklineContainer {
+  position: absolute;
+  bottom: 0;
+  left: -10px; /* Смещаем, чтобы график упирался прямо в края */
+  right: -10px;
+  height: 60%; /* График занимает нижнюю половину карточки */
+  z-index: 1;
+  opacity: 0.3; /* Делаем его полупрозрачным фоном */
+  pointer-events: none; /* Чтобы не перехватывал клики */
+}
