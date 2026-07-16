@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
-import { DashboardPage } from "@/pages/DashboardPage/ui/DashboardPage";
 import "./app/styles/index.css";
 import { StoreProvider } from "./app/providers/StoreProvider";
+import { AppRouter } from "./app/providers/RouterProvider/ui/AppRouter";
 
 const rootElement = document.getElementById("root");
 
@@ -13,6 +13,6 @@ const root = createRoot(rootElement);
 
 root.render(
   <StoreProvider>
-    <DashboardPage />
+    <AppRouter />
   </StoreProvider>,
 );

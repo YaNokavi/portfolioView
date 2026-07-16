@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import * as cls from "./BalanceWidget.module.scss";
 import { selectTotalBalanceMetrics } from "../model/selectors/balanceSelectors";
+import { WidgetCard } from "@/shared/ui/WidgetCard";
 
 export const BalanceWidget = () => {
   const metrics = useSelector(selectTotalBalanceMetrics);
@@ -12,18 +13,14 @@ export const BalanceWidget = () => {
     }).format(val);
 
   return (
-    <div className={cls.widget}>
-      <div>
-        <h2 className={cls.title}>Total Balance</h2>
-        <div className={cls.amount}>{formatCurrency(metrics.totalBalance)}</div>
-      </div>
-
+    <WidgetCard title="Total Balance">
+      <div className={cls.amount}>{formatCurrency(metrics.totalBalance)}</div>
       <div
         className={`${cls.pnl} ${metrics.isPositive ? cls.positive : cls.negative}`}
       >
-        {metrics.isPositive ? "+" : "-"}{" "}
+        {metrics.isPositive ? "+" : "-"}
         {formatCurrency(Math.abs(metrics.pnlValue))} ({metrics.pnlPercent}%)
       </div>
-    </div>
+    </WidgetCard>
   );
 };

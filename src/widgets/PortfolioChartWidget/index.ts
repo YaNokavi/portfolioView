@@ -1,1 +1,1 @@
-import { PortfolioChartWidget } from "./ui/PortfolioChartWidget";
+export { PortfolioChartWidget } from "./ui/PortfolioChartWidget";

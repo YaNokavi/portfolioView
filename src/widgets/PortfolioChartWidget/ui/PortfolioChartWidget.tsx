@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import * as cls from "./PortfolioChartWidget.module.scss";
+import { WidgetCard } from "@/shared/ui/WidgetCard";
 
 const mockData = [
   { date: "Mon", value: 11200 },
@@ -21,17 +22,11 @@ const mockData = [
 
 export const PortfolioChartWidget = () => {
   return (
-    <div className={cls.widget}>
-      <div className={cls.header}>
-        <h2 className={cls.title}>Portfolio Performance</h2>
-        <div className={cls.filters}>
-          {/* Пока просто визуальные заглушки */}
-          <span className={cls.active}>1W</span>
-          <span>1M</span>
-          <span>1Y</span>
-        </div>
-      </div>
-
+    <WidgetCard
+      title="Portfolio Performance"
+      action={<div>...</div>}
+      className={cls.filters}
+    >
       <div className={cls.chartContainer}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
@@ -41,8 +36,8 @@ export const PortfolioChartWidget = () => {
             {/* Описание градиента для заливки */}
             <defs>
               <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop offset="5%" stopColor="#F7931A" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#F7931A" stopOpacity={0} />
               </linearGradient>
             </defs>
 
@@ -50,7 +45,7 @@ export const PortfolioChartWidget = () => {
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
-              stroke="#334155"
+              stroke="#2A2D35"
             />
 
             {/* Оси */}
@@ -58,13 +53,13 @@ export const PortfolioChartWidget = () => {
               dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#9AA1AC", fontSize: 12 }}
               dy={10}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#9AA1AC", fontSize: 12 }}
               dx={-10}
               domain={["dataMin - 500", "dataMax + 500"]}
               width={60}
@@ -73,11 +68,11 @@ export const PortfolioChartWidget = () => {
             {/* Всплывающая подсказка при наведении */}
             <Tooltip
               contentStyle={{
-                backgroundColor: "#1e293b",
-                borderColor: "#334155",
+                backgroundColor: "#1F222A",
+                borderColor: "#2A2D35",
                 borderRadius: "8px",
               }}
-              itemStyle={{ color: "#f8fafc", fontWeight: 600 }}
+              itemStyle={{ color: "#F5F6F8", fontWeight: 600 }}
               formatter={(value: number) => [`$${value}`, "Balance"]}
             />
 
@@ -85,7 +80,7 @@ export const PortfolioChartWidget = () => {
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#3b82f6"
+              stroke="#F7931A"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#colorValue)"
@@ -93,6 +88,6 @@ export const PortfolioChartWidget = () => {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </WidgetCard>
   );
 };

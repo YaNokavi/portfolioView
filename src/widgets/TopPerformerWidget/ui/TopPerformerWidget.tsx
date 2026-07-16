@@ -4,6 +4,7 @@ import { AreaChart, Area, ResponsiveContainer } from "recharts";
 import { selectTopPerformer } from "../model/selectors/topPerformerSelectors";
 import { getAssetColor } from "@/shared/config/assetColors";
 import * as cls from "./TopPerformerWidget.module.scss";
+import { WidgetCard } from "@/shared/ui/WidgetCard";
 
 const mockSparklineData = [
   { value: 120 },
@@ -27,55 +28,44 @@ export const TopPerformerWidget = () => {
   // Если портфель пуст, показываем заглушку
   if (!topAsset) {
     return (
-      <div className={cls.widget}>
-        <div className={cls.content}>
-          <h2 className={cls.title}>Top Performer</h2>
-          <div className={cls.stats}>
-            <div className={cls.subtext}>No assets in portfolio</div>
-          </div>
-        </div>
-      </div>
+      <WidgetCard title="Top Performer">
+        <div className={cls.subtext}>No assets in portfolio</div>
+      </WidgetCard>
     );
   }
 
-  // Динамический цвет (зеленый для плюса, красный для минуса)
   const isPositive = topAsset.isPositive;
   const colorClass = isPositive ? "#34d399" : "#f87171";
   const assetColor = getAssetColor(topAsset.symbol);
 
   return (
-    <div className={cls.widget}>
-      <div className={cls.content}>
-        <h2 className={cls.title}>Top Performer</h2>
-
-        <div className={cls.coinHeader}>
-          <div
-            className={cls.coinIcon}
-            style={{ background: assetColor, color: "#0f172a" }}
-          >
-            {topAsset.symbol}
-          </div>
-          <div>
-            <div className={cls.coinName}>{topAsset.name}</div>
-            <div className={cls.coinSymbol}>
-              Текущая: {formatCurrency(topAsset.currentPrice)}
-            </div>
-          </div>
+    <WidgetCard title="Top Performer">
+      <div className={cls.coinHeader}>
+        <div
+          className={cls.coinIcon}
+          style={{ background: assetColor, color: "#0B0D10" }}
+        >
+          {topAsset.symbol}
         </div>
-
-        <div className={cls.stats}>
-          {/* Стилизуем цвет цифры прямо в инлайне для гибкости */}
-          <div className={cls.percentage} style={{ color: colorClass }}>
-            {isPositive ? "+" : ""}
-            {topAsset.profitPercent}%
-          </div>
-          <div className={cls.subtext}>
-            Avg. buy: {formatCurrency(topAsset.avgBuyPrice)}
+        <div>
+          <div className={cls.coinName}>{topAsset.name}</div>
+          <div className={cls.coinSub}>
+            Текущая: {formatCurrency(topAsset.currentPrice)}
           </div>
         </div>
       </div>
 
-      {/* Фоновый мини-график */}
+      <div className={cls.stats}>
+        <div className={cls.percentage} style={{ color: colorClass }}>
+          {isPositive ? "+" : ""}
+          {topAsset.profitPercent}%
+        </div>
+        <div className={cls.subtext}>
+          Avg. buy: {formatCurrency(topAsset.avgBuyPrice)}
+        </div>
+      </div>
+
+      {/* Фоновый спарклайн */}
       <div className={cls.sparklineContainer}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={mockSparklineData}>
@@ -97,6 +87,6 @@ export const TopPerformerWidget = () => {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </WidgetCard>
   );
 };

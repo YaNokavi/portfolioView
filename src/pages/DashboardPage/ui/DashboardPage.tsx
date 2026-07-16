@@ -1,9 +1,9 @@
-import { AssetSidebarWidget } from "@/widgets/AssetSidebarWidget/ui/AssetSidebarWidget";
+import { AssetSidebarWidget } from "@/widgets/AssetSidebarWidget";
 import { BalanceWidget } from "@/widgets/BalanceWidget";
-import { PortfolioChartWidget } from "@/widgets/PortfolioChartWidget/ui/PortfolioChartWidget";
-import { TopPerformerWidget } from "@/widgets/TopPerformerWidget/ui/TopPerformerWidget";
+import { PortfolioChartWidget } from "@/widgets/PortfolioChartWidget";
+import { TopPerformerWidget } from "@/widgets/TopPerformerWidget";
 import "./DashboardPage.scss";
-import { TransactionTableWidget } from "@/widgets/TransactionTableWidget/ui/TransactionTableWidget";
+import { TransactionTableWidget } from "@/widgets/TransactionTableWidget";
 
 export const DashboardPage = () => {
   return (

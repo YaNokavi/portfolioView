@@ -1,0 +1,35 @@
+.card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden; // ← добавить
+  display: flex; // ← добавить
+  flex-direction: column; // ← добавить
+}

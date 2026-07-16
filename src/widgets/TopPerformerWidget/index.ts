@@ -1,1 +1,1 @@
-import { TopPerformerWidget } from "./ui/TopPerformerWidget";
+export { TopPerformerWidget } from "./ui/TopPerformerWidget";

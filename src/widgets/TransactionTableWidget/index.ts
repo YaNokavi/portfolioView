@@ -1,1 +1,1 @@
-import { TransactionTableWidget } from "./ui/TransactionTableWidget";
+export { TransactionTableWidget } from "./ui/TransactionTableWidget";

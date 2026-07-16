@@ -1,1 +1,1 @@
-import { AssetSidebarWidget } from "./ui/AssetSidebarWidget";
+export { AssetSidebarWidget } from "./ui/AssetSidebarWidget";

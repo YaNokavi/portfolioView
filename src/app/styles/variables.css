@@ -1,0 +1,44 @@
+:root {
+  /* Backgrounds */
+  --color-bg-primary: #0b0d10;
+  --color-bg-secondary: #12141a;
+  --color-bg-card: #16181d;
+  --color-bg-card-hover: #1c1f26;
+  --color-bg-elevated: #1f222a;
+
+  /* Border */
+  --color-border: #2a2d35;
+
+  /* Accent (градиент кнопки) */
+  --color-accent-start: #f7931a;
+  --color-accent-end: #fdb813;
+  --gradient-accent: linear-gradient(90deg, #f7931a 0%, #fdb813 100%);
+
+  /* Semantic */
+  --color-positive: #14f195;
+  --color-negative: #f0465c;
+  --color-neutral: #94a3b8;
+
+  /* Text */
+  --color-text-primary: #f5f6f8;
+  --color-text-secondary: #9aa1ac;
+
+  /* Asset colors */
+  --color-btc: #f7931a;
+  --color-eth: #627eea;
+  --color-sol: #14f195;
+  --color-usdt: #26a17b;
+
+  /* Chart */
+  --color-chart-purple: #8b5cf6;
+
+  /* Spacing */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}

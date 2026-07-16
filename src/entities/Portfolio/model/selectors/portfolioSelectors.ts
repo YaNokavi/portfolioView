@@ -35,6 +35,8 @@ export const selectPortfolioHoldings = createSelector(
         holding.amount += tx.amount;
         holding.totalInvested += tx.amount * tx.price;
       } else if (tx.type === "sell") {
+        const sellRatio = holding.amount > 0 ? tx.amount / holding.amount : 0;
+        holding.totalInvested -= sellRatio * holding.totalInvested;
         holding.amount -= tx.amount;
       }
     });

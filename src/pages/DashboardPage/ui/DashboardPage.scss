@@ -1,12 +1,12 @@
 .bento-dashboard {
   padding: 20px;
   flex: 1;
+  background: var(--color-bg-primary);
 }
 
 .bento-grid {
   display: grid;
-  gap: 20px;
-  /* Десктопная сетка: 4 колонки */
+  gap: 16px;
   grid-template-columns: repeat(4, 1fr);
   grid-template-areas:
     "chart chart chart sidebar"
@@ -15,17 +15,18 @@
 }
 
 .bento-item {
-  background: #1e293b;
-  border-radius: 20px;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
   padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  transition: border-color var(--transition-fast);
 
-  /* Эффект матового стекла (опционально) */
-  backdrop-filter: blur(10px);
+  &:hover {
+    border-color: var(--color-bg-elevated);
+  }
 }
 
-/* Привязка к областям */
 .area-chart {
   grid-area: chart;
   min-height: 300px;
@@ -50,8 +51,7 @@
   min-height: 300px;
 }
 
-/* Адаптив для планшетов */
-@media screen and (max-width: 1024px) {
+@media (max-width: 1024px) {
   .bento-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-template-areas:
@@ -62,15 +62,9 @@
   }
 }
 
-/* Адаптив для мобилок */
-@media screen and (max-width: 768px) {
+@media (max-width: 768px) {
   .bento-grid {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "balance"
-      "chart"
-      "top"
-      "sidebar"
-      "table";
+    grid-template-areas: "balance" "chart" "top" "sidebar" "table";
   }
 }

@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import * as cls from "./TransactionTableWidget.module.scss";
 import { selectTransactions } from "@/entities/Portfolio";
+import { WidgetCard } from "@/shared/ui/WidgetCard";
 
 export const TransactionTableWidget = () => {
   const transactions = useSelector(selectTransactions);
@@ -12,12 +13,10 @@ export const TransactionTableWidget = () => {
     }).format(val);
 
   return (
-    <div className={cls.widget}>
-      <div className={cls.header}>
-        <h2 className={cls.title}>Recent Transactions</h2>
-        <span className={cls.viewAll}>View All</span>
-      </div>
-
+    <WidgetCard
+      title="Recent Transactions"
+      action={<span className={cls.viewAll}>View All</span>}
+    >
       <div className={cls.tableContainer}>
         <table className={cls.table}>
           <thead>
@@ -32,7 +31,6 @@ export const TransactionTableWidget = () => {
           <tbody>
             {transactions.map((tx) => (
               <tr key={tx.id}>
-                {/* 1. Колонка: Иконка покупки/продажи и дата */}
                 <td>
                   <div className={cls.typeCell}>
                     <div
@@ -48,22 +46,14 @@ export const TransactionTableWidget = () => {
                     </div>
                   </div>
                 </td>
-
-                {/* 2. Колонка: Актив */}
                 <td className={cls.assetCell}>
                   {tx.asset} ({tx.symbol})
                 </td>
-
-                {/* 3. Колонка: Количество монет */}
                 <td className={cls.amountCell}>
                   {tx.type === "buy" ? "+" : "-"}
                   {tx.amount} {tx.symbol}
                 </td>
-
-                {/* 4. Колонка: Цена за монету */}
                 <td className={cls.amountCell}>{formatCurrency(tx.price)}</td>
-
-                {/* 5. Колонка: Итоговая сумма сделки */}
                 <td className={cls.totalCell}>
                   {formatCurrency(parseFloat(tx.amount) * tx.price)}
                 </td>
@@ -72,6 +62,6 @@ export const TransactionTableWidget = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </WidgetCard>
   );
 };

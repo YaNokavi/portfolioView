@@ -2,6 +2,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import * as cls from "./AssetSidebarWidget.module.scss";
 import { useSelector } from "react-redux";
 import { selectAssetAllocation } from "../model/selectors/sidebarSelectors";
+import { WidgetCard } from "@/shared/ui/WidgetCard";
 
 // Моковые данные (позже заменим на селектор Redux)
 
@@ -17,11 +18,8 @@ export const AssetSidebarWidget = () => {
     }).format(val);
 
   return (
-    <div className={cls.widget}>
-      <h2 className={cls.title}>Allocation</h2>
-
+    <WidgetCard title="Allocation">
       <div className={cls.chartContainer}>
-        {/* Центральный текст */}
         <div className={cls.centerLabel}>
           <span>Total</span>
           <strong>{formatCurrency(totalValue)}</strong>
@@ -35,10 +33,10 @@ export const AssetSidebarWidget = () => {
               nameKey="name"
               cx="50%"
               cy="50%"
-              innerRadius={70} // Делает из обычного пирога пончик
+              innerRadius={70}
               outerRadius={90}
-              paddingAngle={5} // Зазоры между кусками
-              stroke="none" // Убирает белую обводку
+              paddingAngle={5}
+              stroke="none"
             >
               {allocation.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
@@ -46,11 +44,11 @@ export const AssetSidebarWidget = () => {
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: "#1e293b",
-                borderColor: "#334155",
+                backgroundColor: "#1F222A",
+                borderColor: "#2A2D35",
                 borderRadius: "8px",
               }}
-              itemStyle={{ color: "#f8fafc", fontWeight: 600 }}
+              itemStyle={{ color: "#F5F6F8", fontWeight: 600 }}
               formatter={(value: number) => [formatCurrency(value), "Value"]}
             />
           </PieChart>
@@ -74,6 +72,6 @@ export const AssetSidebarWidget = () => {
           </div>
         ))}
       </div>
-    </div>
+    </WidgetCard>
   );
 };
