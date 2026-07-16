@@ -1,6 +1,10 @@
 # portfolioView — Project Init Document
 
+<<<<<<< HEAD
 > **Назначение файла:** Контекстный документ для передачи состояния проекта нейросетям и новым участникам разработки. Описывает текущее состояние фронтенда, реализованный функционал, архитектуру, модели данных, системные требования и вектор дальнейшего развития.
+=======
+> **Назначение файла:** Контекстный документ для передачи состояния проекта нейросетям и новым участникам разработки. Описывает текущее состояние фронтенда, реализованный функционал, архитектуру, модели данных, а также вектор дальнейшего развития согласно бизнес- и системным требованиям.
+>>>>>>> 23e585a (feat: add init.md)
 >
 > **Репозиторий:** https://github.com/YaNokavi/portfolioView  
 > **Дата последнего обновления:** Июль 2026
@@ -13,12 +17,17 @@
 
 **Текущий статус:** реализован фронтенд-прототип MVP (React + Redux Toolkit) с моковыми данными. Бэкенд не разработан. Архитектурные решения фронтенда приняты с прицелом на последующую интеграцию с REST API бэкенда (Spring Boot 4 / Java 25).
 
+<<<<<<< HEAD
 **Базовая валюта:** USD. Планируется поддержка RUB как второй валюты отображения.
+=======
+**Базовая валюта:** USD. Планируется поддержка RUB как второй валюты.
+>>>>>>> 23e585a (feat: add init.md)
 
 ---
 
 ## 2. Технологический стек (Frontend)
 
+<<<<<<< HEAD
 | Компонент | Выбор | Версия / Обоснование |
 |---|---|---|
 | Язык | TypeScript | 7.0.x; строгая типизация критична для финансовых данных |
@@ -34,13 +43,29 @@
 | Офлайн-кэш | IndexedDB (через `idb`) | Клиентский кэш снапшотов, цен и черновиков; см. раздел 9 |
 | Линтинг | ESLint + Prettier | Нужно добавить в devDependencies |
 | Тесты (план) | Vitest + React Testing Library | Unit и компонентные тесты |
+=======
+| Компонент | Выбор | Версия |
+|---|---|---|
+| Язык | TypeScript | 7.0.x |
+| UI-фреймворк | React | 19.2.x |
+| Стейт-менеджмент | Redux Toolkit + React-Redux | 2.12.x / 9.3.x |
+| Графики | Recharts | 3.9.x |
+| Стили | SCSS Modules (CSS Modules + Sass) | — |
+| Сборщик | Webpack 5 | 5.108.x |
+| Транспилятор | SWC (swc-loader) | — |
+| Архитектурная методология | Feature-Sliced Design (FSD) | — |
+>>>>>>> 23e585a (feat: add init.md)
 
 ### Конфигурация сборки
 - Точка входа: `src/index.tsx`
 - Алиас `@` → `src/` (настроен в `webpack.config.ts` и `tsconfig.json`)
 - CSS Modules автоматически включаются для файлов с `.module.` в имени
 - Обычные `.scss`/`.css` файлы — глобальные стили
+<<<<<<< HEAD
 - Dev-сервер: порт `3000`, HMR включён
+=======
+- Dev-сервер: порт `3000`, HMR включен
+>>>>>>> 23e585a (feat: add init.md)
 
 ---
 
@@ -48,6 +73,7 @@
 
 Проект строго следует методологии FSD. Каждый слой имеет одностороннюю зависимость: вышестоящие слои могут импортировать нижестоящие, но не наоборот.
 
+<<<<<<< HEAD
 **Правило Public API:** каждый слайс экспортирует только через `index.ts` в корне папки. Прямые импорты внутренних файлов запрещены.
 
 ```
@@ -108,6 +134,37 @@ src/
 ---
 
 ## 4. Redux Store (текущее состояние)
+=======
+```
+src/
+├── app/                    # Слой App: инициализация приложения, провайдеры
+│   ├── providers/
+│   │   └── StoreProvider/  # Redux Store Provider
+│   ├── styles/
+│   │   └── index.css       # Глобальный CSS Reset
+│   └── types/
+├── pages/                  # Слой Pages: страницы
+│   └── DashboardPage/
+├── widgets/                # Слой Widgets: составные блоки UI
+│   ├── BalanceWidget/
+│   ├── PortfolioChartWidget/
+│   ├── AssetSidebarWidget/
+│   ├── TopPerformerWidget/
+│   └── TransactionTableWidget/
+├── entities/               # Слой Entities: бизнес-сущности
+│   ├── Portfolio/
+│   └── Market/
+└── shared/                 # Слой Shared: переиспользуемые утилиты
+    └── config/
+        └── assetColors.ts
+```
+
+**Правило Public API:** каждый слайс экспортирует только через `index.ts` в корне папки. Прямые импорты внутренних файлов запрещены.
+
+---
+
+## 4. Redux Store
+>>>>>>> 23e585a (feat: add init.md)
 
 ### 4.1 StateSchema
 
@@ -124,6 +181,11 @@ interface StateSchema {
 
 **Файл:** `src/entities/Portfolio/`
 
+<<<<<<< HEAD
+=======
+#### TypeScript-типы
+
+>>>>>>> 23e585a (feat: add init.md)
 ```typescript
 type TransactionType = 'buy' | 'sell';
 
@@ -142,6 +204,7 @@ interface PortfolioSchema {
 }
 ```
 
+<<<<<<< HEAD
 **Текущий стейт:** 4 моковых записи (BTC x2 buy, ETH sell, SOL buy).
 
 **Экшены:**
@@ -150,6 +213,18 @@ interface PortfolioSchema {
 **Селекторы:**
 - `selectTransactions(state)` — массив транзакций
 - `selectPortfolioHoldings(state)` — мемоизированный (createSelector): агрегирует в `Record<symbol, AssetHolding>`
+=======
+#### Redux Slice
+
+- **Состояние:** массив `transactions` с 4 моковыми записями (BTC x2 buy, ETH sell, SOL buy)
+- **Экшены:**
+  - `addTransaction(Transaction)` — добавляет транзакцию в начало массива
+- **Селекторы:**
+  - `selectTransactions(state)` — массив транзакций
+  - `selectPortfolioHoldings(state)` — мемоизированный (createSelector): агрегирует в `Record<symbol, AssetHolding>`
+
+#### Интерфейс AssetHolding (производный)
+>>>>>>> 23e585a (feat: add init.md)
 
 ```typescript
 interface AssetHolding {
@@ -165,7 +240,11 @@ interface AssetHolding {
 - `buy`: amount += tx.amount, totalInvested += tx.amount * tx.price
 - `sell`: amount -= tx.amount (totalInvested не корректируется)
 
+<<<<<<< HEAD
 > ⚠️ **Техдолг:** При `sell` totalInvested не уменьшается. Требует исправления перед подключением реальных данных. Бизнес-требования предписывают полноценный WAC.
+=======
+> ⚠️ **Техдолг:** При sell totalInvested не уменьшается. Требует исправления перед подключением реальных данных. Бизнес-требования предписывают полноценный WAC.
+>>>>>>> 23e585a (feat: add init.md)
 
 ### 4.3 Сущность: Market
 
@@ -181,6 +260,7 @@ interface MarketSchema {
 }
 ```
 
+<<<<<<< HEAD
 **Текущий стейт:** хардкод `{ BTC: 65000, ETH: 3550, SOL: 148.5, USDT: 1.0 }`
 
 **Экшены:** `updatePrice({ symbol, price })` — задел для WebSocket/polling
@@ -196,12 +276,21 @@ interface StateSchema {
   // portfolioApi, integrationApi, userApi — RTK Query slice'ы
 }
 ```
+=======
+- **Состояние:** хардкод `{ BTC: 65000, ETH: 3550, SOL: 148.5, USDT: 1.0 }`
+- **Экшены:** `updatePrice({ symbol, price })` — задел для WebSocket/polling
+- **Селекторы:** `selectMarketPrices(state)`
+>>>>>>> 23e585a (feat: add init.md)
 
 ---
 
 ## 5. Кросс-сущностные селекторы (Widgets)
 
 ### selectTotalBalanceMetrics
+<<<<<<< HEAD
+=======
+
+>>>>>>> 23e585a (feat: add init.md)
 ```typescript
 // src/widgets/BalanceWidget/model/selectors/balanceSelectors.ts
 {
@@ -213,6 +302,10 @@ interface StateSchema {
 ```
 
 ### selectAssetAllocation
+<<<<<<< HEAD
+=======
+
+>>>>>>> 23e585a (feat: add init.md)
 ```typescript
 // src/widgets/AssetSidebarWidget/model/selectors/sidebarSelectors.ts
 {
@@ -223,6 +316,10 @@ interface StateSchema {
 ```
 
 ### selectTopPerformer
+<<<<<<< HEAD
+=======
+
+>>>>>>> 23e585a (feat: add init.md)
 ```typescript
 // src/widgets/TopPerformerWidget/model/selectors/topPerformerSelectors.ts
 // null если портфель пуст, иначе:
@@ -242,6 +339,7 @@ interface StateSchema {
 
 | Виджет | Area | Данные | Статус |
 |---|---|---|---|
+<<<<<<< HEAD
 | `PortfolioChartWidget` | `area-chart` | AreaChart изменения баланса | ⚠️ Мок |
 | `BalanceWidget` | `area-balance` | Баланс + PnL | ✅ Redux |
 | `TopPerformerWidget` | `area-top` | Лидер роста + sparkline | ✅ Redux (sparkline — мок) |
@@ -249,6 +347,15 @@ interface StateSchema {
 | `TransactionTableWidget` | `area-table` | Таблица транзакций | ✅ Redux |
 
 ### Цветовая палитра (`shared/config/assetColors.ts`)
+=======
+| `PortfolioChartWidget` | `area-chart` | AreaChart изменения баланса | **МОК** |
+| `BalanceWidget` | `area-balance` | Баланс + PnL | **Redux** |
+| `TopPerformerWidget` | `area-top` | Лидер роста + sparkline | **Redux** (sparkline — мок) |
+| `AssetSidebarWidget` | `area-sidebar` | Doughnut + список активов | **Redux** |
+| `TransactionTableWidget` | `area-table` | Таблица транзакций | **Redux** |
+
+### Цветовая палитра (shared/config/assetColors.ts)
+>>>>>>> 23e585a (feat: add init.md)
 
 | BTC | ETH | SOL | USDT | DEFAULT |
 |---|---|---|---|---|
@@ -256,6 +363,7 @@ interface StateSchema {
 
 ---
 
+<<<<<<< HEAD
 ## 7. Маршруты (роутинг)
 
 Роутинг ещё не подключён. Планируется React Router v7.
@@ -498,6 +606,9 @@ async queryFn(arg, _api, _extraOptions, baseQuery) {
 ---
 
 ## 12. Статус соответствия бизнес-требованиям
+=======
+## 7. Соответствие бизнес-требованиям
+>>>>>>> 23e585a (feat: add init.md)
 
 ### Реализовано
 
@@ -511,6 +622,7 @@ async queryFn(arg, _api, _extraOptions, baseQuery) {
 | График изменения баланса | ⚠️ Заглушка |
 | Экшен addTransaction | ⚠️ Есть, UI нет |
 
+<<<<<<< HEAD
 ### Запланировано (следующие итерации)
 
 | Требование | Приоритет |
@@ -520,6 +632,16 @@ async queryFn(arg, _api, _extraOptions, baseQuery) {
 | Исторические снапшоты портфеля | 🔴 Высокий (требует бэкенд) |
 | Аналитика по категориям | 🔴 Высокий |
 | IndexedDB-кэш (снапшоты, цены) | 🔴 Высокий |
+=======
+### Не реализовано (следующие итерации)
+
+| Требование | Приоритет |
+|---|---|
+| features/AddTransaction (модалка) | 🔴 Высокий |
+| Реальные цены (CoinGecko API) | 🔴 Высокий |
+| Исторические снапшоты портфеля | 🔴 Высокий (требует бэкенд) |
+| Аналитика по категориям | 🔴 Высокий |
+>>>>>>> 23e585a (feat: add init.md)
 | Целевая аллокация + ребалансировка | 🟡 Средний |
 | Realized PnL | 🟡 Средний |
 | Типы операций: deposit/withdraw/transfer/dividend | 🟡 Средний |
@@ -528,6 +650,7 @@ async queryFn(arg, _api, _extraOptions, baseQuery) {
 | Интеграции: Bybit, OKX, Т-Инвестиции | 🟡 Средний (бэкенд) |
 | Аутентификация JWT | 🟡 Средний (бэкенд) |
 | Уведомления Telegram | 🔵 Низкий |
+<<<<<<< HEAD
 | Экспорт данных (CSV) | 🔵 Низкий |
 
 ---
@@ -557,3 +680,152 @@ MVP фронтенда можно считать готовым, если пол
 |---|---|---|
 | `REACT_APP_API_URL` | Базовый URL бэкенда | `http://localhost:8080` |
 | `REACT_APP_ENV` | Окружение | `development` / `production` |
+=======
+| Экспорт данных | 🔵 Низкий |
+
+---
+
+## 8. Системные требования (Backend — не реализован)
+
+### Целевой стек
+
+| Java 25 + Spring Boot 4.0.x + Spring Modulith |
+| PostgreSQL 16+ + Liquibase |
+| JWT + refresh-токены + 2FA |
+| Docker (единый образ) |
+| JUnit 5, Mockito, Testcontainers, WireMock, ArchUnit |
+
+### Модули бэкенда
+
+| Модуль | Ответственность |
+|---|---|
+| `portfolio` | Ledger, позиции, средняя цена входа, PnL, снапшоты |
+| `market_data` | Цены (CoinGecko, MOEX), кэш, справочник инструментов |
+| `integration` | Коннекторы: Bybit, OKX, Bitunex, Т-Инвестиции, кошельки |
+| `security` | JWT, 2FA, маскирование секретов |
+| `notification` | Telegram-уведомления |
+
+**Принцип:** каждый модуль = отдельная PostgreSQL-схема. Межмодульное взаимодействие только через публичные Java-интерфейсы или Spring ApplicationEventPublisher.
+
+### Ключевые модели данных (target)
+
+**Transaction (Ledger entry):**
+```
+id, type, source_id, instrument_id, symbol, amount, price,
+currency, price_usd, commission, date, external_id
+```
+
+**Position:**
+```
+id, user_id, source_id, instrument_id, symbol, amount,
+avg_buy_price, avg_buy_price_source (calculated/imported/manual),
+current_price, current_value_usd, category_id, tags[]
+```
+
+**Price point:**
+```
+id, instrument_id, source, price_type (market/last_close/manual/derived),
+quote_currency, price, price_usd, timestamp, is_stale
+```
+
+**Portfolio snapshot:**
+```
+id, user_id, timestamp, total_value_usd, total_value_rub,
+by_category[], by_source[], prices_used{}, fx_rates_used{}
+```
+
+**Storage source:**
+```
+id, user_id, name, type, currency, connection_status,
+last_sync_at, sync_status, sync_error, comment
+```
+
+### REST API (планируемый)
+
+| GET | `/api/v1/portfolio/summary` | Баланс, PnL, структура |
+| GET | `/api/v1/portfolio/positions` | Список позиций |
+| GET/POST | `/api/v1/portfolio/transactions` | Журнал операций |
+| GET | `/api/v1/portfolio/snapshots` | История для графика |
+| GET | `/api/v1/market/prices` | Актуальные цены |
+| GET/PUT | `/api/v1/allocation/target` | Целевая аллокация |
+| GET/POST | `/api/v1/sources` | Источники хранения |
+
+---
+
+## 9. Вектор дальнейшего развития
+
+### 9.1 IndexedDB
+
+Автор планирует использовать IndexedDB как офлайн-слой и клиентский кэш.
+
+**Сценарии:**
+- Офлайн-режим дашборда с кэшированными данными
+- Кэш снапшотов для быстрого отображения графика
+- Черновики транзакций до синхронизации с бэкендом
+- Пользовательские настройки (базовая валюта, целевая аллокация)
+
+**Рекомендуемый инструмент:** `idb` (Promise-обёртка над IndexedDB с TypeScript)
+
+**Стор IndexedDB:**
+
+| Store | Key | Назначение |
+|---|---|---|
+| `transactions` | `id` | Локальная копия журнала |
+| `snapshots` | `timestamp` | История для графика |
+| `market_prices` | `symbol` | Последние известные цены |
+| `settings` | `key` | Настройки пользователя |
+
+**Место в FSD:**
+- `src/shared/lib/idb/` — базовый клиент
+- `src/entities/Portfolio/model/db/` — методы Portfolio
+- `src/entities/Market/model/db/` — кэш цен
+
+### 9.2 Тестирование
+
+Автор планирует покрыть проект тестами.
+
+**Стратегия:**
+
+| Тип | Инструмент | Цель |
+|---|---|---|
+| Unit | Jest | Селекторы Redux, утилиты |
+| Component | @testing-library/react | Рендер виджетов с mock store |
+| Integration | Cypress / Playwright | E2E сценарии |
+
+**Приоритетные тест-кейсы:**
+1. `selectPortfolioHoldings` — корректный avgBuyPrice при комбинациях buy/sell
+2. `selectTotalBalanceMetrics` — PnL при нулевом/положительном балансе
+3. `selectTopPerformer` — null при пустом портфеле
+4. `selectAssetAllocation` — проценты и сортировка
+5. `portfolioSlice.addTransaction` — unshift в начало
+
+**Структура тестов:**
+```
+src/entities/Portfolio/model/selectors/__tests__/portfolioSelectors.test.ts
+src/entities/Market/model/selectors/__tests__/marketSelectors.test.ts
+src/widgets/BalanceWidget/model/selectors/__tests__/balanceSelectors.test.ts
+```
+
+### 9.3 Следующие фичи (очередь)
+
+1. `features/AddTransaction` — модалка + форма, диспатч `portfolioActions.addTransaction`
+2. `features/RefreshPrices` — RTK Query / Thunk к CoinGecko
+3. Подключение `PortfolioChartWidget` к снапшотам Redux
+4. `app/providers/RouterProvider` — React Router v6
+5. `shared/lib/formatCurrency.ts` — убрать дублирование форматтера
+6. ESLint + Prettier конфигурация
+
+---
+
+## 10. Техдолг
+
+| Проблема | Приоритет |
+|---|---|
+| `totalInvested` не корректируется при sell | 🔴 Исправить до интеграции с реальными данными |
+| `formatCurrency` дублируется в 5 виджетах | 🟡 Вынести в shared/lib |
+| Sparkline в TopPerformerWidget на моках | 🟡 Заменить на real data |
+| Фильтры периода в PortfolioChartWidget не работают | 🟡 После снапшотов |
+| Нет роутинга | 🟡 React Router v6 |
+| Нет тестов | 🔴 Jest + RTL |
+| Нет ESLint/Prettier | 🟡 Добавить в devDependencies |
+>>>>>>> 23e585a (feat: add init.md)
