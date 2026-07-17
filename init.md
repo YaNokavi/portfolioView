@@ -19,21 +19,21 @@
 
 ## 2. Технологический стек (Frontend)
 
-| Компонент                 | Выбор                          | Версия / Обоснование                                              |
-| ------------------------- | ------------------------------ | ----------------------------------------------------------------- |
-| Язык                      | TypeScript                     | 7.0.x; строгая типизация критична для финансовых данных           |
-| UI-фреймворк              | React                          | 19.2.x; уже используется в проекте                                |
-| Стейт-менеджмент          | Redux Toolkit + RTK Query      | 2.12.x / 9.3.x; RTK Query закрывает кеширование и серверный стейт |
-| Графики                   | Recharts                       | 3.9.x; линейные графики, pie-chart, bar-chart                     |
-| Стилизация                | SCSS Modules                   | Уже подключены через `sass-loader`; CSS-in-JS не требуется        |
-| Сборщик                   | Webpack 5 + SWC                | 5.108.x; SWC обеспечивает быструю компиляцию                      |
-| Архитектурная методология | Feature-Sliced Design (FSD)    | —                                                                 |
+| Компонент                 | Выбор                          | Версия / Обоснование                                                 |
+| ------------------------- | ------------------------------ | -------------------------------------------------------------------- |
+| Язык                      | TypeScript                     | 7.0.x; строгая типизация критична для финансовых данных              |
+| UI-фреймворк              | React                          | 19.2.x; уже используется в проекте                                   |
+| Стейт-менеджмент          | Redux Toolkit + RTK Query      | 2.12.x / 9.3.x; RTK Query закрывает кеширование и серверный стейт    |
+| Графики                   | Recharts                       | 3.9.x; линейные графики, pie-chart, bar-chart                        |
+| Стилизация                | SCSS Modules                   | Уже подключены через `sass-loader`; CSS-in-JS не требуется           |
+| Сборщик                   | Webpack 5 + SWC                | 5.108.x; SWC обеспечивает быструю компиляцию                         |
+| Архитектурная методология | Feature-Sliced Design (FSD)    | —                                                                    |
 | Роутинг                   | React Router v7                | ✅ Подключён: `createBrowserRouter` в `app/providers/RouterProvider` |
-| Формы                     | React Hook Form + Zod          | Ручной ввод активов, настройка аллокации                          |
-| Дата/время                | date-fns                       | Форматирование временных меток снапшотов, периодов графиков       |
-| Офлайн-кэш                | IndexedDB (через `idb`)        | Клиентский кэш снапшотов, цен и черновиков; см. раздел 9          |
-| Линтинг                   | ESLint + Prettier              | Нужно добавить в devDependencies                                  |
-| Тесты (план)              | Vitest + React Testing Library | Unit и компонентные тесты                                         |
+| Формы                     | React Hook Form + Zod          | Ручной ввод активов, настройка аллокации                             |
+| Дата/время                | date-fns                       | Форматирование временных меток снапшотов, периодов графиков          |
+| Офлайн-кэш                | IndexedDB (через `idb`)        | Клиентский кэш снапшотов, цен и черновиков; см. раздел 9             |
+| Линтинг                   | ESLint + Prettier              | Нужно добавить в devDependencies                                     |
+| Тесты (план)              | Vitest + React Testing Library | Unit и компонентные тесты                                            |
 
 ### Конфигурация сборки
 
@@ -105,8 +105,8 @@ src/
     │   └── assetColors.ts  # ✅ BTC/ETH/SOL/USDT/DEFAULT
     ├── ui/
     │   └── WidgetCard/     # ✅ Общий контейнер для всех виджетов дашборда
-    ├── lib/                # 🔲 formatCurrency, formatDate, calcPnL, calcChange
-    │                       # ⚠️ formatCurrency сейчас дублируется в 4 виджетах — нужно вынести
+    ├── lib/                # ✅ formatCurrency.ts — вынесен, используется во всех
+    │                       # Планируется: formatDate, calcPnL, calcChange
     ├── types/              # Общие TS-типы и интерфейсы
     └── lib/idb/            # 🔲 IndexedDB-клиент (после подключения бэкенда)
 ```
@@ -269,25 +269,30 @@ interface StateSchema {
 
 ### Что осталось доработать в дашборде (сверка с макетом)
 
-| Элемент                | Что нужно сделать                                                                        |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| `BalanceWidget`        | Кнопки периода (24h/7d/30d/YTD), иконка скрытия баланса, отображение в RUB               |
-| `PortfolioChartWidget` | Подключить к `GET /dashboard` (valueHistory), активные фильтры периода                   |
-| `TopPerformerWidget`   | Подпись «7D Change» вместо «Текущая:», sparkline из реальных снапшотов                   |
-| `AssetSidebarWidget`   | Drill-down по подкатегориям через `GET /dashboard/allocation`                            |
+| Элемент                | Что нужно сделать                                                          |
+| ---------------------- | -------------------------------------------------------------------------- |
+| `BalanceWidget`        | Кнопки периода (24h/7d/30d/YTD), иконка скрытия баланса, отображение в RUB |
+| `PortfolioChartWidget` | Подключить к `GET /dashboard` (valueHistory), активные фильтры периода     |
+| `TopPerformerWidget`   | Подпись «7D Change» вместо «Текущая:», sparkline из реальных снапшотов     |
+| `AssetSidebarWidget`   | Drill-down по подкатегориям через `GET /dashboard/allocation`              |
 
 ### `AppSidebar` — детали реализации
 
 Компонент реализован в `src/widgets/AppSidebar/`. Структура:
 
 - `ui/AppSidebar.tsx` — корневой `<aside>`, управляет `isCollapsed` через `useState`
-- `ui/SidebarLogo/` — логотип + текст `portfolioView`
+- `ui/SidebarLogo/` — логотип `/logo.png` + текст `portfolioView`
 - `ui/SidebarNav/` — список `NavLink` из `react-router-dom`, поддержка активного состояния
 - `ui/SidebarProfile/` — аватар (инициалы), имя, план, иконка chevron
 - `model/sidebarConfig.ts` — массивы `NAV_ITEMS` и `BOTTOM_NAV_ITEMS` с иконками `lucide-react`
 
 > ⚠️ **Техдолг:** `SidebarProfile` получает захардкоженные пропсы (`name="user"`, `plan="pro"`). После реализации `session`-стейта — заменить на данные из Redux.
-> ⚠️ **Техдолг:** путь к логотипу в `SidebarLogo` — `../../../../../public/logo.png`. Нужно исправить на `/logo.png`.
+
+### `shared/lib/formatCurrency`
+
+✅ Вынесен в `src/shared/lib/formatCurrency.ts`, экспортируется через `src/shared/lib/index.ts`.
+
+Используется во всех виджетах: `BalanceWidget`, `TopPerformerWidget`, `AssetSidebarWidget`, `TransactionTableWidget`, `PortfolioChartWidget`.
 
 ### Цветовая палитра (`shared/config/assetColors.ts`)
 
@@ -339,13 +344,13 @@ interface WidgetCardProps {
 - [ ] Кнопка ручного обновления цен (`POST /portfolio/refresh`)
 - [ ] Переключатель базового актива USD / RUB
 
-### 7.3 Список активов (AssetListPage) 🔲 не реализовано
+### 7.3 Список активов (AssetListPage) 🔲 в работе
 
 - Таблица позиций: актив, тикер, источник, количество, цена, стоимость, категория, подкатегория, PnL
 - `GET /api/v1/assets` с пагинацией, фильтрами (categoryId, sourceId, assetType, search) и сортировкой
 - Переход в форму редактирования через `GET /assets/{assetId}`
 - Для RUB/USD/USDT поле PnL не показывается (`pnlAvailable: false`)
-- Роут `/assets` уже зарегистрирован в роутере, рендерит заглушку `<div>TODO: AssetsPage</div>`
+- Роут `/assets` уже зарегистрирован в роутере; следующий шаг — вёрстка таблицы позиций на данных из Redux
 
 ### 7.4 Карточка актива (AssetDetailPage) 🔲 не MVP
 
@@ -550,19 +555,19 @@ X-User-Id: e2f8ee9d-7acb-4e09-a2e6-538d59fd922a
 
 Роутинг реализован: `createBrowserRouter` в `src/app/providers/RouterProvider/ui/AppRouter.tsx`.
 
-| Маршрут            | Страница         | MVP? | Статус             |
-| ------------------ | ---------------- | :--: | ------------------ |
+| Маршрут            | Страница         | MVP? | Статус               |
+| ------------------ | ---------------- | :--: | -------------------- |
 | `/login`           | `AuthPage`       |  ✅  | ✅ Реализован (mock) |
-| `/` → `/dashboard` | —                |  ✅  | ✅ Редирект         |
-| `/dashboard`       | `DashboardPage`  |  ✅  | ✅ Реализован       |
-| `/assets`          | `AssetListPage`  |  ✅  | 🔲 Заглушка        |
-| `/assets/add`      | `AddAssetPage`   |  ✅  | 🔲 Не реализован   |
-| `/assets/:id/edit` | `AddAssetPage`   |  ✅  | 🔲 Не реализован   |
-| `/categories`      | `CategoryPage`   |  ❌  | 🔲 Заглушка        |
-| `/allocation`      | `AllocationPage` |  ❌  | 🔲 Заглушка        |
-| `/history`         | `HistoryPage`    |  ❌  | 🔲 Заглушка        |
-| `/sources`         | `SourcesPage`    |  ❌  | 🔲 Заглушка        |
-| `/settings`        | `SettingsPage`   |  ❌  | 🔲 Заглушка        |
+| `/` → `/dashboard` | —                |  ✅  | ✅ Редирект          |
+| `/dashboard`       | `DashboardPage`  |  ✅  | ✅ Реализован        |
+| `/assets`          | `AssetListPage`  |  ✅  | 🔲 В работе          |
+| `/assets/add`      | `AddAssetPage`   |  ✅  | 🔲 Не реализован     |
+| `/assets/:id/edit` | `AddAssetPage`   |  ✅  | 🔲 Не реализован     |
+| `/categories`      | `CategoryPage`   |  ❌  | 🔲 Заглушка          |
+| `/allocation`      | `AllocationPage` |  ❌  | 🔲 Заглушка          |
+| `/history`         | `HistoryPage`    |  ❌  | 🔲 Заглушка          |
+| `/sources`         | `SourcesPage`    |  ❌  | 🔲 Заглушка          |
+| `/settings`        | `SettingsPage`   |  ❌  | 🔲 Заглушка          |
 
 Все маршруты, кроме `/login`, защищены проверкой `localStorage.getItem("token")` в `AppLayout`. При отсутствии — редирект на `/login`.
 
@@ -639,20 +644,18 @@ src/shared/lib/idb/
 
 ## 12. Текущий техдолг
 
-| Проблема                                                                         | Приоритет                                   |
-| -------------------------------------------------------------------------------- | ------------------------------------------- |
-| Нет тестов                                                                       | 🔴 Vitest + RTL                             |
-| `formatCurrency` дублируется в 4 виджетах                                        | 🔴 Вынести в `shared/lib/formatCurrency.ts` |
-| `SidebarProfile` — захардкоженные пропсы (name/plan)                            | 🟡 Заменить на session-стейт после бэкенда  |
-| Путь к логотипу `../../../../../public/logo.png` в `SidebarLogo`                | 🟡 Исправить на `/logo.png`                 |
-| `TransactionType` не расширяем без миграции стейта                               | 🟡 При добавлении deposit/withdraw/transfer |
-| Sparkline в TopPerformerWidget на моках                                          | 🟡 Заменить на снапшоты после бэкенда       |
-| Фильтры периода в PortfolioChartWidget не работают                               | 🟡 После подключения API                    |
-| PortfolioChartWidget на моках                                                    | 🟡 Подключить к `GET /dashboard`            |
-| Нет ESLint/Prettier                                                              | 🟡 Добавить в devDependencies               |
-| Кнопки периода в BalanceWidget отсутствуют                                       | 🟡 24h/7d/30d/YTD                           |
-| Переключатель USD/RUB отсутствует                                                | 🟡 `PATCH /profile/settings`                |
-| AuthPage использует email+password вместо ника                                   | 🟡 Заменить при подключении бэкенда         |
+| Проблема                                             | Приоритет                                   |
+| ---------------------------------------------------- | ------------------------------------------- | --- |
+| Нет тестов                                           | 🔴 Vitest + RTL                             |
+| `SidebarProfile` — захардкоженные пропсы (name/plan) | 🟡 Заменить на session-стейт после бэкенда  |     |
+| `TransactionType` не расширяем без миграции стейта   | 🟡 При добавлении deposit/withdraw/transfer |
+| Sparkline в TopPerformerWidget на моках              | 🟡 Заменить на снапшоты после бэкенда       |
+| Фильтры периода в PortfolioChartWidget не работают   | 🟡 После подключения API                    |
+| PortfolioChartWidget на моках                        | 🟡 Подключить к `GET /dashboard`            |
+| Нет ESLint/Prettier                                  | 🟡 Добавить в devDependencies               |
+| Кнопки периода в BalanceWidget отсутствуют           | 🟡 24h/7d/30d/YTD                           |
+| Переключатель USD/RUB отсутствует                    | 🟡 `PATCH /profile/settings`                |
+| AuthPage использует email+password вместо ника       | 🟡 Заменить при подключении бэкенда         |
 
 ---
 
@@ -675,12 +678,12 @@ src/shared/lib/idb/
 | Защита маршрутов (token guard)           | ✅ в AppLayout          |
 | Страница входа `AuthPage`                | ✅ mock                 |
 | AppLayout (скролл только в Outlet)       | ✅                      |
+| `formatCurrency` в `shared/lib`          | ✅                      |
 
 ### Запланировано для MVP
 
 | Требование                                     | Приоритет |
 | ---------------------------------------------- | --------- |
-| `formatCurrency` → `shared/lib`                | 🔴        |
 | `AssetListPage` — таблица позиций              | 🔴        |
 | `GET /dashboard` + реальный график             | 🔴        |
 | Фильтры периода: 24h/7d/30d/YTD/CUSTOM         | 🔴        |
