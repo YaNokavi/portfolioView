@@ -28,7 +28,7 @@
 | Стилизация                | SCSS Modules                   | Уже подключены через `sass-loader`; CSS-in-JS не требуется        |
 | Сборщик                   | Webpack 5 + SWC                | 5.108.x; SWC обеспечивает быструю компиляцию                      |
 | Архитектурная методология | Feature-Sliced Design (FSD)    | —                                                                 |
-| Роутинг                   | React Router v7                | Нужно добавить; SPA с историей браузера                           |
+| Роутинг                   | React Router v7                | ✅ Подключён: `createBrowserRouter` в `app/providers/RouterProvider` |
 | Формы                     | React Hook Form + Zod          | Ручной ввод активов, настройка аллокации                          |
 | Дата/время                | date-fns                       | Форматирование временных меток снапшотов, периодов графиков       |
 | Офлайн-кэш                | IndexedDB (через `idb`)        | Клиентский кэш снапшотов, цен и черновиков; см. раздел 9          |
@@ -55,17 +55,18 @@
 src/
 ├── app/                    # Инициализация приложения, провайдеры
 │   ├── providers/
-│   │   ├── StoreProvider/  # Redux Store Provider
-│   │   ├── RouterProvider/ # React Router (добавить)
-│   │   └── ThemeProvider/  # (добавить по необходимости)
+│   │   ├── StoreProvider/  # ✅ Redux Store Provider
+│   │   └── RouterProvider/ # ✅ React Router v7 (createBrowserRouter)
+│   ├── layouts/
+│   │   └── AppLayout/      # ✅ Основной layout: AppSidebar + Outlet (скролл только в Outlet)
 │   ├── styles/
 │   │   └── index.css       # Глобальный CSS Reset
 │   └── types/
 ├── pages/                  # Страницы — только компоновка виджетов
 │   ├── DashboardPage/      # ✅ Реализована (bento-grid, все виджеты)
+│   ├── AuthPage/           # ✅ Реализована (mock: email+password, сохраняет token в localStorage)
 │   ├── AssetListPage/      # 🔲 MVP — таблица позиций с фильтрами
 │   ├── AddAssetPage/       # 🔲 MVP — форма добавления/редактирования
-│   ├── LoginPage/          # 🔲 MVP — вход по нику
 │   ├── CategoryPage/       # 🔲 не MVP
 │   ├── AllocationPage/     # 🔲 не MVP
 │   ├── HistoryPage/        # 🔲 не MVP
@@ -77,7 +78,7 @@ src/
 │   ├── AssetSidebarWidget/     # ✅ Redux (нужно: drill-down по подкатегориям)
 │   ├── TopPerformerWidget/     # ✅ Redux (sparkline — мок; нужна подпись «7D Change»)
 │   ├── TransactionTableWidget/ # ✅ Redux
-│   ├── AppSidebar/             # 🔲 Навигационный сайдбар (следующий шаг)
+│   ├── AppSidebar/             # ✅ Реализован: логотип, nav (collapse), профиль
 │   ├── AllocationChartWidget/  # 🔲 Запланирован
 │   ├── CategoryListWidget/     # 🔲 Запланирован
 │   ├── SyncStatusWidget/       # 🔲 Запланирован
@@ -92,7 +93,7 @@ src/
 │   ├── set-allocation/     # 🔲 не MVP
 │   └── export-data/        # 🔲 не MVP
 ├── entities/               # Доменные модели и базовые компоненты
-│   ├── Portfolio/          # ✅ Реализована
+│   ├── Portfolio/          # ✅ Реализована (WAC исправлен в selectPortfolioHoldings)
 │   ├── Market/             # ✅ Реализована
 │   ├── Asset/              # 🔲 MVP
 │   ├── Category/           # 🔲 MVP
@@ -104,8 +105,8 @@ src/
     │   └── assetColors.ts  # ✅ BTC/ETH/SOL/USDT/DEFAULT
     ├── ui/
     │   └── WidgetCard/     # ✅ Общий контейнер для всех виджетов дашборда
-    ├── lib/                # formatCurrency, formatDate, calcPnL, calcChange
-    │                       # ⚠️ formatCurrency сейчас дублируется в 5 виджетах
+    ├── lib/                # 🔲 formatCurrency, formatDate, calcPnL, calcChange
+    │                       # ⚠️ formatCurrency сейчас дублируется в 4 виджетах — нужно вынести
     ├── types/              # Общие TS-типы и интерфейсы
     └── lib/idb/            # 🔲 IndexedDB-клиент (после подключения бэкенда)
 ```
@@ -170,12 +171,12 @@ interface AssetHolding {
 }
 ```
 
-**Алгоритм расчёта avgBuyPrice:** упрощённый Weighted Average Cost.
+**Алгоритм расчёта avgBuyPrice:** Weighted Average Cost. ✅ Исправлен.
 
-- `buy`: amount += tx.amount, totalInvested += tx.amount \* tx.price
-- `sell`: amount -= tx.amount (totalInvested не корректируется)
+- `buy`: `amount += tx.amount`, `totalInvested += tx.amount * tx.price`
+- `sell`: `sellRatio = tx.amount / holding.amount`, `totalInvested -= sellRatio * totalInvested`, `amount -= tx.amount`
 
-> ⚠️ **Техдолг (MVP-блокер):** При `sell` totalInvested не уменьшается — это приводит к некорректному Unrealized PnL и avgBuyPrice. Требует исправления **до отображения реальных данных пользователю**. Бизнес-требования предписывают полноценный WAC: при sell уменьшать totalInvested пропорционально доле проданного amount.
+После обхода всех транзакций: `avgBuyPrice = totalInvested / amount` (если amount > 0).
 
 ### 4.3 Сущность: Market
 
@@ -270,11 +271,23 @@ interface StateSchema {
 
 | Элемент                | Что нужно сделать                                                                        |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
-| `AppSidebar`           | Навигационный сайдбар: логотип, меню (Dashboard/Assets/Add), профиль — **следующий шаг** |
 | `BalanceWidget`        | Кнопки периода (24h/7d/30d/YTD), иконка скрытия баланса, отображение в RUB               |
 | `PortfolioChartWidget` | Подключить к `GET /dashboard` (valueHistory), активные фильтры периода                   |
 | `TopPerformerWidget`   | Подпись «7D Change» вместо «Текущая:», sparkline из реальных снапшотов                   |
 | `AssetSidebarWidget`   | Drill-down по подкатегориям через `GET /dashboard/allocation`                            |
+
+### `AppSidebar` — детали реализации
+
+Компонент реализован в `src/widgets/AppSidebar/`. Структура:
+
+- `ui/AppSidebar.tsx` — корневой `<aside>`, управляет `isCollapsed` через `useState`
+- `ui/SidebarLogo/` — логотип + текст `portfolioView`
+- `ui/SidebarNav/` — список `NavLink` из `react-router-dom`, поддержка активного состояния
+- `ui/SidebarProfile/` — аватар (инициалы), имя, план, иконка chevron
+- `model/sidebarConfig.ts` — массивы `NAV_ITEMS` и `BOTTOM_NAV_ITEMS` с иконками `lucide-react`
+
+> ⚠️ **Техдолг:** `SidebarProfile` получает захардкоженные пропсы (`name="user"`, `plan="pro"`). После реализации `session`-стейта — заменить на данные из Redux.
+> ⚠️ **Техдолг:** путь к логотипу в `SidebarLogo` — `../../../../../public/logo.png`. Нужно исправить на `/logo.png`.
 
 ### Цветовая палитра (`shared/config/assetColors.ts`)
 
@@ -301,28 +314,30 @@ interface WidgetCardProps {
 
 ## 7. MVP-экраны и статус реализации
 
-### 7.1 Вход (LoginPage) 🔲 не реализовано
+### 7.1 Вход (AuthPage) ✅ частично реализовано
 
-- Поле ввода ника, кнопка «Войти»
-- `POST /api/v1/session` → сохранить `userId` в localStorage, `baseCurrency` в settings
-- Передавать `X-User-Id: {userId}` во всех последующих запросах
-- **Нет пароля и JWT в MVP** — ник однозначно определяет владельца портфеля
+- Форма: `email` + `password` (React Hook Form)
+- Mock-логика: сравнение с `MOCK_USER`, имитация запроса 800мс
+- При успехе: `localStorage.setItem("token", "mock-jwt-token")` → `navigate("/dashboard")`
+- Защита маршрутов в `AppLayout`: `localStorage.getItem("token")`, при отсутствии — `<Navigate to="/login" />`
+
+> ⚠️ **Техдолг:** по `init.md` MVP предполагает вход по нику (`POST /session`), без пароля. Текущая реализация использует email+password mock. При подключении бэкенда — заменить на `POST /api/v1/session` + `X-User-Id` заголовок. Ключ в localStorage сменить с `"token"` на `"userId"`.
 
 ### 7.2 Главный дашборд (DashboardPage) ✅ частично
 
 - [x] Bento-grid структура с 5 виджетами
 - [x] Общая стоимость портфеля (Redux, мок)
-- [x] PnL (Unrealized, Redux, ⚠️ WAC-баг)
+- [x] PnL Unrealized (Redux, WAC исправлен ✅)
 - [x] Диаграмма аллокации по активам (Redux)
 - [x] Top Performer (Redux)
 - [x] Таблица транзакций (Redux)
+- [x] Навигационный сайдбар `AppSidebar` ✅
 - [ ] График с реальными данными (`GET /dashboard?period=7D`)
 - [ ] Фильтры периода: 24h / 7d / 30d / YTD / CUSTOM
 - [ ] PnL за выбранный период (из `periodPnL` ответа API)
 - [ ] Диаграмма по подкатегориям (`GET /dashboard/allocation?groupBy=subcategory`)
 - [ ] Кнопка ручного обновления цен (`POST /portfolio/refresh`)
 - [ ] Переключатель базового актива USD / RUB
-- [ ] Навигационный сайдбар `AppSidebar`
 
 ### 7.3 Список активов (AssetListPage) 🔲 не реализовано
 
@@ -330,6 +345,7 @@ interface WidgetCardProps {
 - `GET /api/v1/assets` с пагинацией, фильтрами (categoryId, sourceId, assetType, search) и сортировкой
 - Переход в форму редактирования через `GET /assets/{assetId}`
 - Для RUB/USD/USDT поле PnL не показывается (`pnlAvailable: false`)
+- Роут `/assets` уже зарегистрирован в роутере, рендерит заглушку `<div>TODO: AssetsPage</div>`
 
 ### 7.4 Карточка актива (AssetDetailPage) 🔲 не MVP
 
@@ -532,23 +548,23 @@ X-User-Id: e2f8ee9d-7acb-4e09-a2e6-538d59fd922a
 
 ## 9. Маршруты (роутинг)
 
-Роутинг ещё не подключён. Планируется React Router v7.
+Роутинг реализован: `createBrowserRouter` в `src/app/providers/RouterProvider/ui/AppRouter.tsx`.
 
-| Маршрут            | Страница         | MVP? | Описание            |
-| ------------------ | ---------------- | :--: | ------------------- |
-| `/login`           | `LoginPage`      |  ✅  | Вход по нику        |
-| `/` → `/dashboard` | —                |  ✅  | Редирект            |
-| `/dashboard`       | `DashboardPage`  |  ✅  | Главный экран       |
-| `/assets`          | `AssetListPage`  |  ✅  | Список позиций      |
-| `/assets/add`      | `AddAssetPage`   |  ✅  | Добавление актива   |
-| `/assets/:id/edit` | `AddAssetPage`   |  ✅  | Редактирование      |
-| `/categories`      | `CategoryPage`   |  ❌  | Аналитика категорий |
-| `/allocation`      | `AllocationPage` |  ❌  | Целевая аллокация   |
-| `/history`         | `HistoryPage`    |  ❌  | Журнал операций     |
-| `/sources`         | `SourcesPage`    |  ❌  | Источники хранения  |
-| `/settings`        | `SettingsPage`   |  ❌  | Настройки           |
+| Маршрут            | Страница         | MVP? | Статус             |
+| ------------------ | ---------------- | :--: | ------------------ |
+| `/login`           | `AuthPage`       |  ✅  | ✅ Реализован (mock) |
+| `/` → `/dashboard` | —                |  ✅  | ✅ Редирект         |
+| `/dashboard`       | `DashboardPage`  |  ✅  | ✅ Реализован       |
+| `/assets`          | `AssetListPage`  |  ✅  | 🔲 Заглушка        |
+| `/assets/add`      | `AddAssetPage`   |  ✅  | 🔲 Не реализован   |
+| `/assets/:id/edit` | `AddAssetPage`   |  ✅  | 🔲 Не реализован   |
+| `/categories`      | `CategoryPage`   |  ❌  | 🔲 Заглушка        |
+| `/allocation`      | `AllocationPage` |  ❌  | 🔲 Заглушка        |
+| `/history`         | `HistoryPage`    |  ❌  | 🔲 Заглушка        |
+| `/sources`         | `SourcesPage`    |  ❌  | 🔲 Заглушка        |
+| `/settings`        | `SettingsPage`   |  ❌  | 🔲 Заглушка        |
 
-Все маршруты, кроме `/login`, защищены проверкой наличия `userId` в localStorage. При отсутствии — редирект на `/login`.
+Все маршруты, кроме `/login`, защищены проверкой `localStorage.getItem("token")` в `AppLayout`. При отсутствии — редирект на `/login`.
 
 ---
 
@@ -625,11 +641,10 @@ src/shared/lib/idb/
 
 | Проблема                                                                         | Приоритет                                   |
 | -------------------------------------------------------------------------------- | ------------------------------------------- |
-| `totalInvested` не корректируется при `sell` — некорректный WAC и Unrealized PnL | 🔴 **MVP-блокер**                           |
 | Нет тестов                                                                       | 🔴 Vitest + RTL                             |
-| Нет роутинга                                                                     | 🔴 Добавить React Router v7                 |
-| `AppSidebar` не реализован                                                       | 🔴 Следующий шаг                            |
-| `formatCurrency` дублируется в 5 виджетах                                        | 🟡 Вынести в `shared/lib/formatCurrency.ts` |
+| `formatCurrency` дублируется в 4 виджетах                                        | 🔴 Вынести в `shared/lib/formatCurrency.ts` |
+| `SidebarProfile` — захардкоженные пропсы (name/plan)                            | 🟡 Заменить на session-стейт после бэкенда  |
+| Путь к логотипу `../../../../../public/logo.png` в `SidebarLogo`                | 🟡 Исправить на `/logo.png`                 |
 | `TransactionType` не расширяем без миграции стейта                               | 🟡 При добавлении deposit/withdraw/transfer |
 | Sparkline в TopPerformerWidget на моках                                          | 🟡 Заменить на снапшоты после бэкенда       |
 | Фильтры периода в PortfolioChartWidget не работают                               | 🟡 После подключения API                    |
@@ -637,6 +652,7 @@ src/shared/lib/idb/
 | Нет ESLint/Prettier                                                              | 🟡 Добавить в devDependencies               |
 | Кнопки периода в BalanceWidget отсутствуют                                       | 🟡 24h/7d/30d/YTD                           |
 | Переключатель USD/RUB отсутствует                                                | 🟡 `PATCH /profile/settings`                |
+| AuthPage использует email+password вместо ника                                   | 🟡 Заменить при подключении бэкенда         |
 
 ---
 
@@ -644,33 +660,35 @@ src/shared/lib/idb/
 
 ### Реализовано
 
-| Требование                               | Статус              |
-| ---------------------------------------- | ------------------- |
-| Дашборд с балансом                       | ✅ Redux (мок)      |
-| Структура по активам (allocation)        | ✅ Redux            |
-| Unrealized PnL                           | ✅ Redux ⚠️ WAC-баг |
-| Лидер роста                              | ✅ Redux            |
-| Журнал операций                          | ✅ Redux            |
-| Bento-grid адаптивный дашборд            | ✅                  |
-| WidgetCard — общий компонент             | ✅                  |
-| Дизайн-система (CSS-переменные, палитра) | ✅                  |
+| Требование                               | Статус                  |
+| ---------------------------------------- | ----------------------- |
+| Дашборд с балансом                       | ✅ Redux (мок)          |
+| Структура по активам (allocation)        | ✅ Redux                |
+| Unrealized PnL                           | ✅ Redux, WAC исправлен |
+| Лидер роста                              | ✅ Redux                |
+| Журнал операций                          | ✅ Redux                |
+| Bento-grid адаптивный дашборд            | ✅                      |
+| WidgetCard — общий компонент             | ✅                      |
+| Дизайн-система (CSS-переменные, палитра) | ✅                      |
+| Навигационный сайдбар `AppSidebar`       | ✅ с collapse           |
+| Роутинг React Router v7                  | ✅ createBrowserRouter  |
+| Защита маршрутов (token guard)           | ✅ в AppLayout          |
+| Страница входа `AuthPage`                | ✅ mock                 |
+| AppLayout (скролл только в Outlet)       | ✅                      |
 
 ### Запланировано для MVP
 
-| Требование                                     | Приоритет         |
-| ---------------------------------------------- | ----------------- |
-| Исправление WAC при `sell`                     | 🔴 **MVP-блокер** |
-| `AppSidebar` — навигация                       | 🔴 Следующий шаг  |
-| Вход по нику (`POST /session`)                 | 🔴                |
-| `GET /dashboard` + реальный график             | 🔴                |
-| Фильтры периода: 24h/7d/30d/YTD/CUSTOM         | 🔴                |
-| Переключатель USD/RUB                          | 🔴                |
-| Кнопка ручного обновления цен                  | 🔴                |
-| Список активов (`GET /assets`)                 | 🔴                |
-| Форма добавления актива (`POST /assets`)       | 🔴                |
-| Операции BUY/SELL/ADJUSTMENT                   | 🔴                |
-| Валидация тикера (`GET /instruments/validate`) | 🔴                |
-| Роутинг React Router v7                        | 🔴                |
+| Требование                                     | Приоритет |
+| ---------------------------------------------- | --------- |
+| `formatCurrency` → `shared/lib`                | 🔴        |
+| `AssetListPage` — таблица позиций              | 🔴        |
+| `GET /dashboard` + реальный график             | 🔴        |
+| Фильтры периода: 24h/7d/30d/YTD/CUSTOM         | 🔴        |
+| Переключатель USD/RUB                          | 🔴        |
+| Кнопка ручного обновления цен                  | 🔴        |
+| Форма добавления актива (`POST /assets`)       | 🔴        |
+| Операции BUY/SELL/ADJUSTMENT                   | 🔴        |
+| Валидация тикера (`GET /instruments/validate`) | 🔴        |
 
 ### Не входит в MVP
 
