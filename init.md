@@ -2,7 +2,7 @@
 
 > **Назначение файла:** Контекстный документ для передачи состояния проекта нейросетям и новым участникам разработки. Описывает текущее состояние фронтенда, реализованный функционал, архитектуру, модели данных, системные требования и вектор дальнейшего развития.
 >
-> **Репозиторий:** https://github.com/YaNokavi/portfolioView  
+> **Репозиторий:** https://github.com/YaNokavi/portfolioView
 > **Дата последнего обновления:** Июль 2026
 
 ---
@@ -119,7 +119,7 @@ src/
 ```typescript
 interface StateSchema {
   portfolio: PortfolioSchema; // Транзакции и позиции
-  market: MarketSchema;       // Рыночные цены
+  market: MarketSchema; // Рыночные цены
 }
 ```
 
@@ -137,10 +137,10 @@ type TransactionType = "buy" | "sell";
 interface Transaction {
   id: string;
   type: TransactionType;
-  asset: string;   // 'Bitcoin'
-  symbol: string;  // 'BTC'
-  amount: number;  // Количество монет
-  price: number;   // Цена за единицу в USD
+  asset: string; // 'Bitcoin'
+  symbol: string; // 'BTC'
+  amount: number; // Количество монет
+  price: number; // Цена за единицу в USD
   date: string;
 }
 
@@ -152,9 +152,11 @@ interface PortfolioSchema {
 **Текущий стейт:** 4 моковых записи (BTC x2 buy, ETH sell, SOL buy).
 
 **Экшены:**
+
 - `addTransaction(Transaction)` — добавляет транзакцию в начало массива
 
 **Селекторы:**
+
 - `selectTransactions(state)` — массив транзакций
 - `selectPortfolioHoldings(state)` — мемоизированный (createSelector): агрегирует в `Record<symbol, AssetHolding>`
 
@@ -162,14 +164,15 @@ interface PortfolioSchema {
 interface AssetHolding {
   symbol: string;
   name: string;
-  amount: number;        // Текущее кол-во (buy - sell)
+  amount: number; // Текущее кол-во (buy - sell)
   totalInvested: number; // Сумма всех покупок в USD
-  avgBuyPrice: number;   // totalInvested / amount
+  avgBuyPrice: number; // totalInvested / amount
 }
 ```
 
 **Алгоритм расчёта avgBuyPrice:** упрощённый Weighted Average Cost.
-- `buy`: amount += tx.amount, totalInvested += tx.amount * tx.price
+
+- `buy`: amount += tx.amount, totalInvested += tx.amount \* tx.price
 - `sell`: amount -= tx.amount (totalInvested не корректируется)
 
 > ⚠️ **Техдолг (MVP-блокер):** При `sell` totalInvested не уменьшается — это приводит к некорректному Unrealized PnL и avgBuyPrice. Требует исправления **до отображения реальных данных пользователю**. Бизнес-требования предписывают полноценный WAC: при sell уменьшать totalInvested пропорционально доле проданного amount.
@@ -198,8 +201,8 @@ interface MarketSchema {
 interface StateSchema {
   portfolio: PortfolioSchema;
   market: MarketSchema;
-  session: SessionSchema;       // userId, nickname, baseCurrency (вместо JWT — X-User-Id)
-  settings: SettingsSchema;     // Базовая валюта, выбранный период графика
+  session: SessionSchema; // userId, nickname, baseCurrency (вместо JWT — X-User-Id)
+  settings: SettingsSchema; // Базовая валюта, выбранный период графика
   // dashboardApi, assetsApi, referenceApi — RTK Query slice'ы
 }
 ```
@@ -213,9 +216,9 @@ interface StateSchema {
 ```typescript
 // src/widgets/BalanceWidget/model/selectors/balanceSelectors.ts
 {
-  totalBalance: number;  // Σ(amount * currentPrice)
-  pnlValue: number;      // totalBalance - totalInvested  ← Unrealized PnL
-  pnlPercent: number;    // (pnlValue / totalInvested) * 100
+  totalBalance: number; // Σ(amount * currentPrice)
+  pnlValue: number; // totalBalance - totalInvested  ← Unrealized PnL
+  pnlPercent: number; // (pnlValue / totalInvested) * 100
   isPositive: boolean;
 }
 ```
@@ -239,10 +242,13 @@ interface StateSchema {
 // src/widgets/TopPerformerWidget/model/selectors/topPerformerSelectors.ts
 // null если портфель пуст, иначе:
 {
-  symbol, name, avgBuyPrice, currentPrice,
-  profitPercent, // ((currentPrice - avgBuyPrice) / avgBuyPrice) * 100
-  profitValue,   // (currentPrice - avgBuyPrice) * amount
-  isPositive
+  (symbol,
+    name,
+    avgBuyPrice,
+    currentPrice,
+    profitPercent, // ((currentPrice - avgBuyPrice) / avgBuyPrice) * 100
+    profitValue, // (currentPrice - avgBuyPrice) * amount
+    isPositive);
 }
 ```
 
@@ -252,23 +258,23 @@ interface StateSchema {
 
 Дашборд — **Bento Grid** с именованными CSS-областями. Все виджеты используют общий `WidgetCard` из `shared/ui/WidgetCard`.
 
-| Виджет                   | Area           | Данные                      | Статус                     |
-| ------------------------ | -------------- | --------------------------- | -------------------------- |
-| `PortfolioChartWidget`   | `area-chart`   | AreaChart изменения баланса | ⚠️ Мок (оранжевый градиент)|
-| `BalanceWidget`          | `area-balance` | Баланс + Unrealized PnL     | ✅ Redux                   |
-| `TopPerformerWidget`     | `area-top`     | Лидер роста + sparkline     | ✅ Redux (sparkline — мок) |
-| `AssetSidebarWidget`     | `area-sidebar` | Doughnut + список активов   | ✅ Redux                   |
-| `TransactionTableWidget` | `area-table`   | Таблица транзакций          | ✅ Redux                   |
+| Виджет                   | Area           | Данные                      | Статус                      |
+| ------------------------ | -------------- | --------------------------- | --------------------------- |
+| `PortfolioChartWidget`   | `area-chart`   | AreaChart изменения баланса | ⚠️ Мок (оранжевый градиент) |
+| `BalanceWidget`          | `area-balance` | Баланс + Unrealized PnL     | ✅ Redux                    |
+| `TopPerformerWidget`     | `area-top`     | Лидер роста + sparkline     | ✅ Redux (sparkline — мок)  |
+| `AssetSidebarWidget`     | `area-sidebar` | Doughnut + список активов   | ✅ Redux                    |
+| `TransactionTableWidget` | `area-table`   | Таблица транзакций          | ✅ Redux                    |
 
 ### Что осталось доработать в дашборде (сверка с макетом)
 
-| Элемент | Что нужно сделать |
-| ------- | ----------------- |
-| `AppSidebar` | Навигационный сайдбар: логотип, меню (Dashboard/Assets/Add), профиль — **следующий шаг** |
-| `BalanceWidget` | Кнопки периода (24h/7d/30d/YTD), иконка скрытия баланса, отображение в RUB |
-| `PortfolioChartWidget` | Подключить к `GET /dashboard` (valueHistory), активные фильтры периода |
-| `TopPerformerWidget` | Подпись «7D Change» вместо «Текущая:», sparkline из реальных снапшотов |
-| `AssetSidebarWidget` | Drill-down по подкатегориям через `GET /dashboard/allocation` |
+| Элемент                | Что нужно сделать                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `AppSidebar`           | Навигационный сайдбар: логотип, меню (Dashboard/Assets/Add), профиль — **следующий шаг** |
+| `BalanceWidget`        | Кнопки периода (24h/7d/30d/YTD), иконка скрытия баланса, отображение в RUB               |
+| `PortfolioChartWidget` | Подключить к `GET /dashboard` (valueHistory), активные фильтры периода                   |
+| `TopPerformerWidget`   | Подпись «7D Change» вместо «Текущая:», sparkline из реальных снапшотов                   |
+| `AssetSidebarWidget`   | Drill-down по подкатегориям через `GET /dashboard/allocation`                            |
 
 ### Цветовая палитра (`shared/config/assetColors.ts`)
 
@@ -330,6 +336,7 @@ interface WidgetCardProps {
 ### 7.5 Добавление и редактирование актива (AddAssetPage) 🔲 не реализовано
 
 **Форма:**
+
 - Тип актива: CRYPTO, STOCK, CURRENCY, DEPOSIT, MANUAL
 - Тикер (с валидацией через `GET /instruments/validate`)
 - Количество, цена и дата покупки, валюта сделки (RUB/USD)
@@ -338,11 +345,13 @@ interface WidgetCardProps {
 - Ручная текущая цена — если рыночной нет
 
 **Логика тикера:**
+
 - После ввода тикера — запрос `GET /instruments/validate?symbol=BTC&assetType=CRYPTO`
 - Если `valid: false` → предложить ручную цену, создать с `assetType=MANUAL`
 - Если актив уже есть в источнике → бэкенд вернёт `409 ASSET_ALREADY_EXISTS` → предложить добавить операцию к существующей позиции
 
 **Отправка:**
+
 - Новый актив: `POST /assets`
 - Редактирование метаданных: `PATCH /assets/{assetId}`
 - Докупка/продажа: `POST /assets/{assetId}/operations` (тип BUY / SELL / ADJUSTMENT)
@@ -381,33 +390,33 @@ X-User-Id: e2f8ee9d-7acb-4e09-a2e6-538d59fd922a
 }
 ```
 
-| Статус | Значение |
-|---|---|
-| `200` | Успешный запрос |
-| `201` | Сущность создана |
-| `202` | Асинхронная задача принята |
-| `400` | Неверные параметры или бизнес-валидация |
-| `404` | Сущность не найдена или не принадлежит пользователю |
-| `409` | Конфликт (например, актив уже существует в источнике) |
-| `422` | Невозможно выполнить расчёт |
+| Статус | Значение                                              |
+| ------ | ----------------------------------------------------- |
+| `200`  | Успешный запрос                                       |
+| `201`  | Сущность создана                                      |
+| `202`  | Асинхронная задача принята                            |
+| `400`  | Неверные параметры или бизнес-валидация               |
+| `404`  | Сущность не найдена или не принадлежит пользователю   |
+| `409`  | Конфликт (например, актив уже существует в источнике) |
+| `422`  | Невозможно выполнить расчёт                           |
 
 ### Эндпоинты MVP
 
 #### Сессия и настройки
 
-| Метод   | Путь                   | Назначение |
-|---------|------------------------|------------|
-| `POST`  | `/session`             | Вход по нику. Request: `{nickname}`. Response: `{userId, nickname, baseCurrency}` |
-| `PATCH` | `/profile/settings`    | Смена базовой валюты. Request: `{baseCurrency: "RUB"}` |
+| Метод   | Путь                | Назначение                                                                        |
+| ------- | ------------------- | --------------------------------------------------------------------------------- |
+| `POST`  | `/session`          | Вход по нику. Request: `{nickname}`. Response: `{userId, nickname, baseCurrency}` |
+| `PATCH` | `/profile/settings` | Смена базовой валюты. Request: `{baseCurrency: "RUB"}`                            |
 
 #### Дашборд
 
-| Метод  | Путь                              | Назначение |
-|--------|-----------------------------------|------------|
-| `GET`  | `/dashboard`                      | Все данные дашборда. Query: `currency`, `period` (24H/7D/30D/YTD/CUSTOM), `from`, `to` |
-| `GET`  | `/dashboard/allocation`           | Аллокация по подкатегориям. Query: `groupBy=subcategory`, `categoryId`, `currency` |
-| `POST` | `/portfolio/refresh`              | Ручное обновление цен. Response `202`: `{refreshId, status: "STARTED"}` |
-| `GET`  | `/portfolio/refresh/{refreshId}`  | Статус обновления. Опрашивать до `COMPLETED` или `FAILED` |
+| Метод  | Путь                             | Назначение                                                                             |
+| ------ | -------------------------------- | -------------------------------------------------------------------------------------- |
+| `GET`  | `/dashboard`                     | Все данные дашборда. Query: `currency`, `period` (24H/7D/30D/YTD/CUSTOM), `from`, `to` |
+| `GET`  | `/dashboard/allocation`          | Аллокация по подкатегориям. Query: `groupBy=subcategory`, `categoryId`, `currency`     |
+| `POST` | `/portfolio/refresh`             | Ручное обновление цен. Response `202`: `{refreshId, status: "STARTED"}`                |
+| `GET`  | `/portfolio/refresh/{refreshId}` | Статус обновления. Опрашивать до `COMPLETED` или `FAILED`                              |
 
 **Структура ответа `GET /dashboard`:**
 
@@ -419,14 +428,32 @@ X-User-Id: e2f8ee9d-7acb-4e09-a2e6-538d59fd922a
   "periodPnL": { "absolute": 3420.18, "percent": 2.29 },
   "valueHistory": [{ "timestamp": "...", "value": 148120.35 }],
   "allocationByCategory": [
-    { "category": { "id": "crypto", "name": "Криптовалюта" }, "value": 95000.00, "sharePercent": 62.32 }
+    {
+      "category": { "id": "crypto", "name": "Криптовалюта" },
+      "value": 95000.0,
+      "sharePercent": 62.32
+    }
   ],
   "topPerformer": {
-    "assetId": "uuid", "symbol": "BTC", "name": "Bitcoin", "pnl": 5400.00, "pnlPercent": 18.80
+    "assetId": "uuid",
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "pnl": 5400.0,
+    "pnlPercent": 18.8
   },
   "marketDataStatus": [
-    { "provider": "COINGECKO", "status": "SUCCESS", "isStale": false, "lastSuccessfulRefreshAt": "..." },
-    { "provider": "MOEX_ISS", "status": "FAILED", "isStale": true, "message": "Используются последние доступные котировки" }
+    {
+      "provider": "COINGECKO",
+      "status": "SUCCESS",
+      "isStale": false,
+      "lastSuccessfulRefreshAt": "..."
+    },
+    {
+      "provider": "MOEX_ISS",
+      "status": "FAILED",
+      "isStale": true,
+      "message": "Используются последние доступные котировки"
+    }
   ]
 }
 ```
@@ -436,62 +463,67 @@ X-User-Id: e2f8ee9d-7acb-4e09-a2e6-538d59fd922a
 
 #### Активы
 
-| Метод    | Путь                             | Назначение |
-|----------|----------------------------------|------------|
-| `GET`    | `/assets`                        | Список позиций. Query: `currency`, `page`, `size`, `categoryId`, `subcategoryId`, `sourceId`, `assetType`, `search`, `sort` |
-| `GET`    | `/assets/{assetId}`              | Детали позиции (для формы редактирования) |
-| `POST`   | `/assets`                        | Создать ручную позицию + начальную операцию |
-| `PATCH`  | `/assets/{assetId}`              | Изменить только метаданные (не количество!) |
-| `DELETE` | `/assets/{assetId}`              | Удалить ошибочно созданную ручную позицию |
+| Метод    | Путь                | Назначение                                                                                                                  |
+| -------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `GET`    | `/assets`           | Список позиций. Query: `currency`, `page`, `size`, `categoryId`, `subcategoryId`, `sourceId`, `assetType`, `search`, `sort` |
+| `GET`    | `/assets/{assetId}` | Детали позиции (для формы редактирования)                                                                                   |
+| `POST`   | `/assets`           | Создать ручную позицию + начальную операцию                                                                                 |
+| `PATCH`  | `/assets/{assetId}` | Изменить только метаданные (не количество!)                                                                                 |
+| `DELETE` | `/assets/{assetId}` | Удалить ошибочно созданную ручную позицию                                                                                   |
 
 #### Операции по позиции
 
-| Метод | Путь                                | Назначение |
-|-------|-------------------------------------|------------|
-| `POST` | `/assets/{assetId}/operations`     | Добавить BUY / SELL / ADJUSTMENT |
-| `GET`  | `/assets/{assetId}/operations`     | История операций по позиции |
+| Метод  | Путь                           | Назначение                       |
+| ------ | ------------------------------ | -------------------------------- |
+| `POST` | `/assets/{assetId}/operations` | Добавить BUY / SELL / ADJUSTMENT |
+| `GET`  | `/assets/{assetId}/operations` | История операций по позиции      |
 
 **Типы операций:**
 
-| `type`       | Влияние на среднюю цену |
-|--------------|------------------------|
-| `BUY`        | Средневзвешенный пересчёт |
-| `SELL`       | Не меняет среднюю цену остатка |
+| `type`       | Влияние на среднюю цену                |
+| ------------ | -------------------------------------- |
+| `BUY`        | Средневзвешенный пересчёт              |
+| `SELL`       | Не меняет среднюю цену остатка         |
 | `ADJUSTMENT` | Требует явно задать новую среднюю цену |
 
 #### Справочники
 
-| Метод  | Путь                        | Назначение |
-|--------|-----------------------------|------------|
-| `GET`  | `/reference/categories`     | Категории + подкатегории для формы актива |
-| `GET`  | `/sources`                  | Источники хранения для селекта |
-| `POST` | `/sources`                  | Создать новый ручной источник |
-| `GET`  | `/instruments/validate`     | Проверить тикер через CoinGecko / MOEX ISS. Query: `symbol`, `assetType` |
+| Метод  | Путь                    | Назначение                                                               |
+| ------ | ----------------------- | ------------------------------------------------------------------------ |
+| `GET`  | `/reference/categories` | Категории + подкатегории для формы актива                                |
+| `GET`  | `/sources`              | Источники хранения для селекта                                           |
+| `POST` | `/sources`              | Создать новый ручной источник                                            |
+| `GET`  | `/instruments/validate` | Проверить тикер через CoinGecko / MOEX ISS. Query: `symbol`, `assetType` |
 
 > Frontend **не обращается напрямую** к CoinGecko или MOEX — только через бэкенд.
 
 ### Последовательность запросов на страницах
 
 **Вход:**
+
 1. `POST /session` → сохранить `userId` + `baseCurrency`
 2. Открыть дашборд
 
 **Дашборд:**
+
 1. `GET /dashboard?currency={currency}&period=30D`
 2. При клике на категорию → `GET /dashboard/allocation?groupBy=subcategory&categoryId=...`
 3. При ручном обновлении → `POST /portfolio/refresh` → опрос `GET /portfolio/refresh/{id}` → повторить `GET /dashboard`
 
 **Список активов:**
+
 1. `GET /assets` с нужными фильтрами, пагинацией, сортировкой
 2. Для редактирования → `GET /assets/{assetId}`
 
 **Добавление ручного актива:**
+
 1. Параллельно: `GET /reference/categories` + `GET /sources`
 2. После ввода тикера → `GET /instruments/validate`
 3. При необходимости создать источник → `POST /sources`
 4. Отправить форму → `POST /assets`
 
 **Докупка / продажа:**
+
 1. `GET /assets/{assetId}`
 2. `POST /assets/{assetId}/operations` (BUY / SELL / ADJUSTMENT)
 3. Обновить список и дашборд
@@ -502,19 +534,19 @@ X-User-Id: e2f8ee9d-7acb-4e09-a2e6-538d59fd922a
 
 Роутинг ещё не подключён. Планируется React Router v7.
 
-| Маршрут              | Страница       | MVP? | Описание |
-|----------------------|----------------|:----:|----------|
-| `/login`             | `LoginPage`    | ✅   | Вход по нику |
-| `/` → `/dashboard`   | —              | ✅   | Редирект |
-| `/dashboard`         | `DashboardPage`| ✅   | Главный экран |
-| `/assets`            | `AssetListPage`| ✅   | Список позиций |
-| `/assets/add`        | `AddAssetPage` | ✅   | Добавление актива |
-| `/assets/:id/edit`   | `AddAssetPage` | ✅   | Редактирование |
-| `/categories`        | `CategoryPage` | ❌   | Аналитика категорий |
-| `/allocation`        | `AllocationPage`| ❌  | Целевая аллокация |
-| `/history`           | `HistoryPage`  | ❌   | Журнал операций |
-| `/sources`           | `SourcesPage`  | ❌   | Источники хранения |
-| `/settings`          | `SettingsPage` | ❌   | Настройки |
+| Маршрут            | Страница         | MVP? | Описание            |
+| ------------------ | ---------------- | :--: | ------------------- |
+| `/login`           | `LoginPage`      |  ✅  | Вход по нику        |
+| `/` → `/dashboard` | —                |  ✅  | Редирект            |
+| `/dashboard`       | `DashboardPage`  |  ✅  | Главный экран       |
+| `/assets`          | `AssetListPage`  |  ✅  | Список позиций      |
+| `/assets/add`      | `AddAssetPage`   |  ✅  | Добавление актива   |
+| `/assets/:id/edit` | `AddAssetPage`   |  ✅  | Редактирование      |
+| `/categories`      | `CategoryPage`   |  ❌  | Аналитика категорий |
+| `/allocation`      | `AllocationPage` |  ❌  | Целевая аллокация   |
+| `/history`         | `HistoryPage`    |  ❌  | Журнал операций     |
+| `/sources`         | `SourcesPage`    |  ❌  | Источники хранения  |
+| `/settings`        | `SettingsPage`   |  ❌  | Настройки           |
 
 Все маршруты, кроме `/login`, защищены проверкой наличия `userId` в localStorage. При отсутствии — редирект на `/login`.
 
@@ -536,13 +568,13 @@ IndexedDB используется как локальное хранилище 
 
 ### Структура хранилища
 
-| Store                | Key         | Назначение |
-|----------------------|-------------|------------|
-| `snapshots`          | `timestamp` | История снапшотов для графика |
-| `market_prices`      | `symbol`    | Последние известные цены |
-| `transactions`       | `id`        | Локальная копия журнала операций |
+| Store                | Key         | Назначение                         |
+| -------------------- | ----------- | ---------------------------------- |
+| `snapshots`          | `timestamp` | История снапшотов для графика      |
+| `market_prices`      | `symbol`    | Последние известные цены           |
+| `transactions`       | `id`        | Локальная копия журнала операций   |
 | `draft_transactions` | `id`        | Черновики в ожидании синхронизации |
-| `settings`           | `key`       | Настройки пользователя |
+| `settings`           | `key`       | Настройки пользователя             |
 
 ### Место в FSD-структуре
 
@@ -591,20 +623,20 @@ src/shared/lib/idb/
 
 ## 12. Текущий техдолг
 
-| Проблема | Приоритет |
-|----------|-----------|
-| `totalInvested` не корректируется при `sell` — некорректный WAC и Unrealized PnL | 🔴 **MVP-блокер** |
-| Нет тестов | 🔴 Vitest + RTL |
-| Нет роутинга | 🔴 Добавить React Router v7 |
-| `AppSidebar` не реализован | 🔴 Следующий шаг |
-| `formatCurrency` дублируется в 5 виджетах | 🟡 Вынести в `shared/lib/formatCurrency.ts` |
-| `TransactionType` не расширяем без миграции стейта | 🟡 При добавлении deposit/withdraw/transfer |
-| Sparkline в TopPerformerWidget на моках | 🟡 Заменить на снапшоты после бэкенда |
-| Фильтры периода в PortfolioChartWidget не работают | 🟡 После подключения API |
-| PortfolioChartWidget на моках | 🟡 Подключить к `GET /dashboard` |
-| Нет ESLint/Prettier | 🟡 Добавить в devDependencies |
-| Кнопки периода в BalanceWidget отсутствуют | 🟡 24h/7d/30d/YTD |
-| Переключатель USD/RUB отсутствует | 🟡 `PATCH /profile/settings` |
+| Проблема                                                                         | Приоритет                                   |
+| -------------------------------------------------------------------------------- | ------------------------------------------- |
+| `totalInvested` не корректируется при `sell` — некорректный WAC и Unrealized PnL | 🔴 **MVP-блокер**                           |
+| Нет тестов                                                                       | 🔴 Vitest + RTL                             |
+| Нет роутинга                                                                     | 🔴 Добавить React Router v7                 |
+| `AppSidebar` не реализован                                                       | 🔴 Следующий шаг                            |
+| `formatCurrency` дублируется в 5 виджетах                                        | 🟡 Вынести в `shared/lib/formatCurrency.ts` |
+| `TransactionType` не расширяем без миграции стейта                               | 🟡 При добавлении deposit/withdraw/transfer |
+| Sparkline в TopPerformerWidget на моках                                          | 🟡 Заменить на снапшоты после бэкенда       |
+| Фильтры периода в PortfolioChartWidget не работают                               | 🟡 После подключения API                    |
+| PortfolioChartWidget на моках                                                    | 🟡 Подключить к `GET /dashboard`            |
+| Нет ESLint/Prettier                                                              | 🟡 Добавить в devDependencies               |
+| Кнопки периода в BalanceWidget отсутствуют                                       | 🟡 24h/7d/30d/YTD                           |
+| Переключатель USD/RUB отсутствует                                                | 🟡 `PATCH /profile/settings`                |
 
 ---
 
@@ -612,53 +644,53 @@ src/shared/lib/idb/
 
 ### Реализовано
 
-| Требование | Статус |
-|------------|--------|
-| Дашборд с балансом | ✅ Redux (мок) |
-| Структура по активам (allocation) | ✅ Redux |
-| Unrealized PnL | ✅ Redux ⚠️ WAC-баг |
-| Лидер роста | ✅ Redux |
-| Журнал операций | ✅ Redux |
-| Bento-grid адаптивный дашборд | ✅ |
-| WidgetCard — общий компонент | ✅ |
-| Дизайн-система (CSS-переменные, палитра) | ✅ |
+| Требование                               | Статус              |
+| ---------------------------------------- | ------------------- |
+| Дашборд с балансом                       | ✅ Redux (мок)      |
+| Структура по активам (allocation)        | ✅ Redux            |
+| Unrealized PnL                           | ✅ Redux ⚠️ WAC-баг |
+| Лидер роста                              | ✅ Redux            |
+| Журнал операций                          | ✅ Redux            |
+| Bento-grid адаптивный дашборд            | ✅                  |
+| WidgetCard — общий компонент             | ✅                  |
+| Дизайн-система (CSS-переменные, палитра) | ✅                  |
 
 ### Запланировано для MVP
 
-| Требование | Приоритет |
-|------------|-----------|
-| Исправление WAC при `sell` | 🔴 **MVP-блокер** |
-| `AppSidebar` — навигация | 🔴 Следующий шаг |
-| Вход по нику (`POST /session`) | 🔴 |
-| `GET /dashboard` + реальный график | 🔴 |
-| Фильтры периода: 24h/7d/30d/YTD/CUSTOM | 🔴 |
-| Переключатель USD/RUB | 🔴 |
-| Кнопка ручного обновления цен | 🔴 |
-| Список активов (`GET /assets`) | 🔴 |
-| Форма добавления актива (`POST /assets`) | 🔴 |
-| Операции BUY/SELL/ADJUSTMENT | 🔴 |
-| Валидация тикера (`GET /instruments/validate`) | 🔴 |
-| Роутинг React Router v7 | 🔴 |
+| Требование                                     | Приоритет         |
+| ---------------------------------------------- | ----------------- |
+| Исправление WAC при `sell`                     | 🔴 **MVP-блокер** |
+| `AppSidebar` — навигация                       | 🔴 Следующий шаг  |
+| Вход по нику (`POST /session`)                 | 🔴                |
+| `GET /dashboard` + реальный график             | 🔴                |
+| Фильтры периода: 24h/7d/30d/YTD/CUSTOM         | 🔴                |
+| Переключатель USD/RUB                          | 🔴                |
+| Кнопка ручного обновления цен                  | 🔴                |
+| Список активов (`GET /assets`)                 | 🔴                |
+| Форма добавления актива (`POST /assets`)       | 🔴                |
+| Операции BUY/SELL/ADJUSTMENT                   | 🔴                |
+| Валидация тикера (`GET /instruments/validate`) | 🔴                |
+| Роутинг React Router v7                        | 🔴                |
 
 ### Не входит в MVP
 
-| Требование |
-|------------|
+| Требование                              |
+| --------------------------------------- |
 | Карточка актива с историческим графиком |
-| Аналитика категорий и drill-down |
-| Источники хранения (управление) |
-| Управление подкатегориями |
-| Настройки профиля |
-| Realized PnL |
-| IndexedDB-кэш (после бэкенда) |
-| Экспорт CSV |
-| Уведомления Telegram |
+| Аналитика категорий и drill-down        |
+| Источники хранения (управление)         |
+| Управление подкатегориями               |
+| Настройки профиля                       |
+| Realized PnL                            |
+| IndexedDB-кэш (после бэкенда)           |
+| Экспорт CSV                             |
+| Уведомления Telegram                    |
 
 ---
 
 ## 14. Переменные окружения
 
-| Переменная          | Назначение          | Пример                  |
-|---------------------|---------------------|-------------------------|
-| `REACT_APP_API_URL` | Базовый URL бэкенда | `http://localhost:8080`  |
+| Переменная          | Назначение          | Пример                       |
+| ------------------- | ------------------- | ---------------------------- |
+| `REACT_APP_API_URL` | Базовый URL бэкенда | `http://localhost:8080`      |
 | `REACT_APP_ENV`     | Окружение           | `development` / `production` |

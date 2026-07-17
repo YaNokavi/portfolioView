@@ -1,6 +1,6 @@
 import { AuthPage } from "@/pages/AuthPage";
 import { DashboardPage } from "@/pages/DashboardPage";
-import { AppLayout } from "@/widgets/AppLayout";
+import { AppLayout } from "@/app/layouts/AppLayout";
 
 import {
   createBrowserRouter,
