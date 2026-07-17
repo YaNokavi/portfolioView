@@ -2,8 +2,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  border-radius: var(--radius-md);
+  height: 44px;
+  padding: 0 12px; // не меняется при коллапсе!
+  border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
   text-decoration: none;
   transition:
@@ -11,32 +12,39 @@
     color var(--transition-fast);
 
   &:hover {
-    background: var(--color-bg-elevated);
-    color: var(--color-text-primary);
+    background: rgba(255, 255, 255, 0.05);
   }
+}
 
-  &.active {
-    background: var(--color-bg-elevated);
-    color: var(--color-accent-start);
-  }
+.active {
+  background: rgba(247, 147, 26, 0.12);
+  color: var(--color-accent-start);
 }
 
 .icon {
-  flex-shrink: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .label {
-  font-size: 14px;
-  font-weight: 500;
-  white-space: nowrap;
+  min-width: 0;
+  max-width: 160px;
   overflow: hidden;
+  white-space: nowrap;
   opacity: 1;
-  transition: opacity var(--transition-normal);
+  margin-left: 0;
+  transition:
+    max-width var(--transition-normal),
+    opacity var(--transition-fast),
+    margin-left var(--transition-normal);
 }
 
-[data-collapsed="true"] & .label {
+// только это меняется при коллапсе — никаких gap/padding/justify-content
+[data-collapsed="true"] .label {
+  max-width: 0;
   opacity: 0;
-  width: 0;
 }

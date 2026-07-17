@@ -1,0 +1,35 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+  min-width: 0; // критично — разрешает .logo сжиматься меньше контента
+  overflow: hidden;
+}
+
+.logoIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 160px;
+  opacity: 1;
+  transition:
+    max-width var(--transition-normal),
+    opacity var(--transition-fast);
+}
+
+[data-collapsed="true"] .logo {
+  max-width: 0;
+  opacity: 0;
+}

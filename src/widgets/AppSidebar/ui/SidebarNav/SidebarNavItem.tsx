@@ -11,7 +11,7 @@ export const SidebarNavItem = ({ item }: SidebarNavItemProps) => {
     <NavLink
       to={item.path}
       className={({ isActive }) =>
-        `${styles.item} ${isActive ? styles.active : ""}`
+        `${styles.item} ${isActive ? styles.active : ""}`.trim()
       }
     >
       <span className={styles.icon}>
