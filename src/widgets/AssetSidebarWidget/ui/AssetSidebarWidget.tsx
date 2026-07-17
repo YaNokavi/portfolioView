@@ -3,19 +3,10 @@ import * as cls from "./AssetSidebarWidget.module.scss";
 import { useSelector } from "react-redux";
 import { selectAssetAllocation } from "../model/selectors/sidebarSelectors";
 import { WidgetCard } from "@/shared/ui/WidgetCard";
-
-// Моковые данные (позже заменим на селектор Redux)
+import { formatCurrency } from "@/shared/lib";
 
 export const AssetSidebarWidget = () => {
-  // Считаем общую сумму для центральной надписи
-
   const { allocation, totalValue } = useSelector(selectAssetAllocation);
-
-  const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(val);
 
   return (
     <WidgetCard title="Allocation">

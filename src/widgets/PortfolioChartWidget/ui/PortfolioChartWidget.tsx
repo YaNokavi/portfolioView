@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import * as cls from "./PortfolioChartWidget.module.scss";
 import { WidgetCard } from "@/shared/ui/WidgetCard";
+import { formatCurrency } from "@/shared/lib";
 
 const mockData = [
   { date: "Mon", value: 11200 },
@@ -73,7 +74,7 @@ export const PortfolioChartWidget = () => {
                 borderRadius: "8px",
               }}
               itemStyle={{ color: "#F5F6F8", fontWeight: 600 }}
-              formatter={(value: number) => [`$${value}`, "Balance"]}
+              formatter={(value: number) => [formatCurrency(value), "Balance"]}
             />
 
             {/* Сама линия и заливка */}

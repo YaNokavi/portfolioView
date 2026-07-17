@@ -2,15 +2,10 @@ import { useSelector } from "react-redux";
 import * as cls from "./TransactionTableWidget.module.scss";
 import { selectTransactions } from "@/entities/Portfolio";
 import { WidgetCard } from "@/shared/ui/WidgetCard";
+import { formatCurrency } from "@/shared/lib";
 
 export const TransactionTableWidget = () => {
   const transactions = useSelector(selectTransactions);
-
-  const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(val);
 
   return (
     <WidgetCard
@@ -55,7 +50,7 @@ export const TransactionTableWidget = () => {
                 </td>
                 <td className={cls.amountCell}>{formatCurrency(tx.price)}</td>
                 <td className={cls.totalCell}>
-                  {formatCurrency(parseFloat(tx.amount) * tx.price)}
+                  {formatCurrency(tx.amount * tx.price)}
                 </td>
               </tr>
             ))}

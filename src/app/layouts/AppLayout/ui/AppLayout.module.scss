@@ -1,0 +1,12 @@
+.layout {
+  display: flex;
+  height: 100dvh; // вся высота viewport
+  overflow: hidden; // запрещаем скролл самого layout
+}
+
+.content {
+  flex: 1;
+  min-width: 0; // важно! без этого flex-child не сжимается корректно
+  overflow-y: auto; // скролл только здесь
+  overscroll-behavior-y: none;
+}

@@ -1,10 +1,10 @@
-import React from "react";
 import { useSelector } from "react-redux";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 import { selectTopPerformer } from "../model/selectors/topPerformerSelectors";
 import { getAssetColor } from "@/shared/config/assetColors";
 import * as cls from "./TopPerformerWidget.module.scss";
 import { WidgetCard } from "@/shared/ui/WidgetCard";
+import { formatCurrency } from "@/shared/lib";
 
 const mockSparklineData = [
   { value: 120 },
@@ -18,12 +18,6 @@ const mockSparklineData = [
 
 export const TopPerformerWidget = () => {
   const topAsset = useSelector(selectTopPerformer);
-
-  const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(val);
 
   // Если портфель пуст, показываем заглушку
   if (!topAsset) {
