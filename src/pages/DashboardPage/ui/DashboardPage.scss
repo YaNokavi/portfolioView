@@ -1,12 +1,11 @@
 .bento-dashboard {
   padding: 20px;
   flex: 1;
-  background: var(--color-bg-primary);
 }
 
 .bento-grid {
   display: grid;
-  gap: 16px;
+  gap: 20px;
   grid-template-columns: repeat(4, 1fr);
   grid-template-areas:
     "chart chart chart sidebar"

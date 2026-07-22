@@ -29,7 +29,7 @@ export const AppSidebar = () => {
       </div>
 
       <div className={styles.bottomSection}>
-        <SidebarNav items={BOTTOM_NAV_ITEMS} />
+        {/* <SidebarNav items={BOTTOM_NAV_ITEMS} /> */}
         <SidebarProfile name={"user"} plan={"pro"} initials={"US"} />
       </div>
     </aside>

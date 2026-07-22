@@ -1,6 +1,7 @@
 import { AuthPage } from "@/pages/AuthPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { AppLayout } from "@/app/layouts/AppLayout";
+import { AssetListPage } from "@/pages/AssetsListPage";
 
 import {
   createBrowserRouter,
@@ -31,7 +32,7 @@ const router = createBrowserRouter([
       {
         path: "assets",
         children: [
-          { index: true, element: <div>TODO: AssetsPage</div> },
+          { index: true, element: <AssetListPage /> },
           {
             path: ":assetId",
             element: <div>TODO: AssetsPage Detail</div>,

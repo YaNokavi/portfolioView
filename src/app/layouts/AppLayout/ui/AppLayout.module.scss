@@ -2,6 +2,7 @@
   display: flex;
   height: 100dvh; // вся высота viewport
   overflow: hidden; // запрещаем скролл самого layout
+  background: var(--color-bg-primary);
 }
 
 .content {
