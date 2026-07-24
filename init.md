@@ -65,8 +65,7 @@ src/
 ├── pages/                  # Страницы — только компоновка виджетов
 │   ├── DashboardPage/      # ✅ Реализована (bento-grid, все виджеты)
 │   ├── AuthPage/           # ✅ Реализована (mock: email+password, сохраняет token в localStorage)
-│   ├── AssetListPage/      # 🔲 MVP — таблица позиций с фильтрами
-│   ├── AddAssetPage/       # 🔲 MVP — форма добавления/редактирования
+│   ├── AssetListPage/      # ✅ Реализована (карточка, таблица, PnL, empty state, палитра через CSS-переменные) 🔲 Не реализованы фильтры/сортировки таблицы
 │   ├── CategoryPage/       # 🔲 не MVP
 │   ├── AllocationPage/     # 🔲 не MVP
 │   ├── HistoryPage/        # 🔲 не MVP
@@ -84,8 +83,16 @@ src/
 │   ├── SyncStatusWidget/       # 🔲 Запланирован
 │   └── PnLSummaryWidget/       # 🔲 Запланирован
 ├── features/               # Изолированные пользовательские сценарии
-│   ├── add-asset/          # 🔲 MVP — модалка + форма
-│   ├── edit-asset/         # 🔲 MVP
+│   ├── add-asset/          # ✅ Реализована как модалка (не страница!)
+│   │   ├── model/
+│   │   │   ├── useAssetModal.ts   # ✅ Стейт-машина режимов: add / edit(symbol) / null
+│   │   │   ├── types.ts            # ✅ ModalMode через generic Action<Type, Payload>
+│   │   │   └── schema.ts           # ✅ Zod-схема (symbol, name, amount, price, date)
+│   │   └── ui/
+│   │       ├── AddAssetModal.tsx   # ✅ Динамический заголовок (Add/Edit asset)
+│   │       └── AddAssetForm.tsx    # ✅ RHF + Zod, dispatch addTransaction
+│   ├── edit-asset/         # ⚠️ Частично — режим "edit" в ModalMode заведён, но
+│   │                        #   предзаполнение формы данными holding ещё не реализовано
 │   ├── add-operation/      # 🔲 MVP — BUY/SELL/ADJUSTMENT по существующей позиции
 │   ├── manual-sync/        # 🔲 MVP — кнопка обновления цен
 │   ├── switch-currency/    # 🔲 MVP — переключение USD/RUB
@@ -104,7 +111,10 @@ src/
     ├── config/             # assetColors, currencyMap, periodOptions
     │   └── assetColors.ts  # ✅ BTC/ETH/SOL/USDT/DEFAULT
     ├── ui/
-    │   └── WidgetCard/     # ✅ Общий контейнер для всех виджетов дашборда
+    │   ├── WidgetCard/      # ✅
+    │   ├── Modal/           # ✅ Новый — портал в #modal-root, esc-закрытие, скролл-лок
+    │   ├── Input/           # ✅ Доработан: добавлен проп label, spellCheck={false}
+    │   └── Button/          # ✅ variant/isLoading/leftIcon/fullWidth
     ├── lib/                # ✅ formatCurrency.ts — вынесен, используется во всех
     │                       # Планируется: formatDate, calcPnL, calcChange
     ├── types/              # Общие TS-типы и интерфейсы
@@ -344,38 +354,45 @@ interface WidgetCardProps {
 - [ ] Кнопка ручного обновления цен (`POST /portfolio/refresh`)
 - [ ] Переключатель базового актива USD / RUB
 
-### 7.3 Список активов (AssetListPage) 🔲 в работе
+### 7.3 Список активов (AssetListPage) ✅ реализовано (без фильтров и API)
 
-- Таблица позиций: актив, тикер, источник, количество, цена, стоимость, категория, подкатегория, PnL
-- `GET /api/v1/assets` с пагинацией, фильтрами (categoryId, sourceId, assetType, search) и сортировкой
-- Переход в форму редактирования через `GET /assets/{assetId}`
-- Для RUB/USD/USDT поле PnL не показывается (`pnlAvailable: false`)
-- Роут `/assets` уже зарегистрирован в роутере; следующий шаг — вёрстка таблицы позиций на данных из Redux
+- Таблица позиций: актив (иконка + имя + тикер), amount, avg buy, current, value, PnL
+- Данные берутся из `selectPortfolioHoldings` (Redux, моки) — без пагинации и фильтров API
+- PnL скрывается для USD/RUB/USDT (`pnlAvailable: false`), рендерится "—"
+- Empty state — если позиций нет, показывается строка-заглушка на всю ширину таблицы
+- Кнопка "Add asset" в шапке карточки открывает модалку (см. 7.5), не переход по роуту
+- Стилизация приведена к общему UI: карточка, hover на строках, цвета через CSS-переменные (`--color-positive`, `--color-negative`, `--color-bg-card` и т.д.)
+
+**Осталось:** сортировка по колонкам, фильтры (categoryId, sourceId, search), клик по строке → переход в edit-режим модалки, пагинация после подключения `GET /assets`.
+
+⚠️ **Известный кейс в моках:** транзакция sell ETH превышает фактический остаток → `amount` уходит в отрицательное значение, `avgBuyPrice = 0`. Это осознанно не фиксится — баг мок-данных, не логики `selectPortfolioHoldings`.
 
 ### 7.4 Карточка актива (AssetDetailPage) 🔲 не MVP
 
-### 7.5 Добавление и редактирование актива (AddAssetPage) 🔲 не реализовано
+### 7.5 Добавление и редактирование актива (модалка, не страница) ✅ частично реализовано
 
-**Форма:**
+> ⚠️ **Архитектурное решение изменено:** изначально планировалась отдельная страница `AddAssetPage`
+> с роутами `/assets/add` и `/assets/:id/edit`. По факту эти роуты никогда не были зарегистрированы —
+> в роутере есть только `/assets` (список) и `/assets/:assetId` (заглушка под будущую detail-страницу).
+> Решено реализовать add/edit как **модалку** через `shared/ui/Modal` (портал в `#modal-root`),
+> без изменения URL — это транзакционное действие, а не самостоятельный экран.
 
-- Тип актива: CRYPTO, STOCK, CURRENCY, DEPOSIT, MANUAL
-- Тикер (с валидацией через `GET /instruments/validate`)
-- Количество, цена и дата покупки, валюта сделки (RUB/USD)
-- Категория + подкатегория (`GET /reference/categories`)
-- Источник хранения (`GET /sources`, возможность создать новый через `POST /sources`)
-- Ручная текущая цена — если рыночной нет
+**Реализовано:**
 
-**Логика тикера:**
+- `shared/ui/Modal` — универсальная обёртка: `createPortal` в `#modal-root`, закрытие по Escape и клику на оверлей, блокировка скролла body на время открытия
+- `features/add-asset/model/useAssetModal` — хук с состоянием `{ type: "add" } | { type: "edit", symbol } | null`
+- `ModalMode` типизирован через generic `Action<Type, Payload>` для чистоты дискриминированного union
+- `AddAssetModal` — динамический заголовок ("Add asset" / "Edit asset") в зависимости от режима
+- `AddAssetForm` — React Hook Form + Zod, поля: symbol, name, amount, price, date
+- Сабмит диспатчит `addTransaction` в `entities/Portfolio` (тип всегда `"buy"` на данный момент)
 
-- После ввода тикера — запрос `GET /instruments/validate?symbol=BTC&assetType=CRYPTO`
-- Если `valid: false` → предложить ручную цену, создать с `assetType=MANUAL`
-- Если актив уже есть в источнике → бэкенд вернёт `409 ASSET_ALREADY_EXISTS` → предложить добавить операцию к существующей позиции
+**Не реализовано:**
 
-**Отправка:**
-
-- Новый актив: `POST /assets`
-- Редактирование метаданных: `PATCH /assets/{assetId}`
-- Докупка/продажа: `POST /assets/{assetId}/operations` (тип BUY / SELL / ADJUSTMENT)
+- Режим `edit` не предзаполняет форму данными существующей позиции
+- Нет выбора типа операции (BUY/SELL/ADJUSTMENT) — только buy
+- Нет валидации тикера через `GET /instruments/validate` (бэкенда нет)
+- Нет категории/подкатегории и источника хранения в форме
+- Нет обработки `409 ASSET_ALREADY_EXISTS`
 
 ### 7.6 Аналитика категорий (CategoryPage) 🔲 не MVP
 
@@ -555,19 +572,18 @@ X-User-Id: e2f8ee9d-7acb-4e09-a2e6-538d59fd922a
 
 Роутинг реализован: `createBrowserRouter` в `src/app/providers/RouterProvider/ui/AppRouter.tsx`.
 
-| Маршрут            | Страница         | MVP? | Статус               |
-| ------------------ | ---------------- | :--: | -------------------- |
-| `/login`           | `AuthPage`       |  ✅  | ✅ Реализован (mock) |
-| `/` → `/dashboard` | —                |  ✅  | ✅ Редирект          |
-| `/dashboard`       | `DashboardPage`  |  ✅  | ✅ Реализован        |
-| `/assets`          | `AssetListPage`  |  ✅  | 🔲 В работе          |
-| `/assets/add`      | `AddAssetPage`   |  ✅  | 🔲 Не реализован     |
-| `/assets/:id/edit` | `AddAssetPage`   |  ✅  | 🔲 Не реализован     |
-| `/categories`      | `CategoryPage`   |  ❌  | 🔲 Заглушка          |
-| `/allocation`      | `AllocationPage` |  ❌  | 🔲 Заглушка          |
-| `/history`         | `HistoryPage`    |  ❌  | 🔲 Заглушка          |
-| `/sources`         | `SourcesPage`    |  ❌  | 🔲 Заглушка          |
-| `/settings`        | `SettingsPage`   |  ❌  | 🔲 Заглушка          |
+| Маршрут            | Страница          | MVP? | Статус               |
+| ------------------ | ----------------- | :--: | -------------------- |
+| `/login`           | `AuthPage`        |  ✅  | ✅ Реализован (mock) |
+| `/` → `/dashboard` | —                 |  ✅  | ✅ Редирект          |
+| `/dashboard`       | `DashboardPage`   |  ✅  | ✅ Реализован        |
+| `/assets`          | `AssetListPage`   |  ✅  | ✅ Реализован        |
+| `/assets/:assetId` | detail (заглушка) |  ❌  | 🔲 Не MVP пока       |
+| `/categories`      | `CategoryPage`    |  ❌  | 🔲 Заглушка          |
+| `/allocation`      | `AllocationPage`  |  ❌  | 🔲 Заглушка          |
+| `/history`         | `HistoryPage`     |  ❌  | 🔲 Заглушка          |
+| `/sources`         | `SourcesPage`     |  ❌  | 🔲 Заглушка          |
+| `/settings`        | `SettingsPage`    |  ❌  | 🔲 Заглушка          |
 
 Все маршруты, кроме `/login`, защищены проверкой `localStorage.getItem("token")` в `AppLayout`. При отсутствии — редирект на `/login`.
 
@@ -656,6 +672,9 @@ src/shared/lib/idb/
 | Кнопки периода в BalanceWidget отсутствуют           | 🟡 24h/7d/30d/YTD                           |
 | Переключатель USD/RUB отсутствует                    | 🟡 `PATCH /profile/settings`                |
 | AuthPage использует email+password вместо ника       | 🟡 Заменить при подключении бэкенда         |
+| Режим edit в AddAssetModal не предзаполняет форму    | 🟡 Прикрутить при доработке edit-сценария   |
+| AddAssetForm не поддерживает SELL/ADJUSTMENT         | 🟡 Только BUY на данный момент              |
+| Input не имел label до правки — теперь ✅ добавлен   | ✅ Закрыто                                  |
 
 ---
 
@@ -665,6 +684,9 @@ src/shared/lib/idb/
 
 | Требование                               | Статус                  |
 | ---------------------------------------- | ----------------------- |
+| `AssetListPage` — таблица позиций        | ✅ Redux (без фильтров) |
+| Модалка добавления актива (add-asset)    | ✅ RHF + Zod            |
+| `shared/ui/Modal` — портал-компонент     | ✅                      |
 | Дашборд с балансом                       | ✅ Redux (мок)          |
 | Структура по активам (allocation)        | ✅ Redux                |
 | Unrealized PnL                           | ✅ Redux, WAC исправлен |
@@ -684,7 +706,6 @@ src/shared/lib/idb/
 
 | Требование                                     | Приоритет |
 | ---------------------------------------------- | --------- |
-| `AssetListPage` — таблица позиций              | 🔴        |
 | `GET /dashboard` + реальный график             | 🔴        |
 | Фильтры периода: 24h/7d/30d/YTD/CUSTOM         | 🔴        |
 | Переключатель USD/RUB                          | 🔴        |
