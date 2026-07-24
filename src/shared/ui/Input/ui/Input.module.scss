@@ -11,6 +11,7 @@
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  border-color: var(--color-accent-start);
   transition: border-color var(--transition-fast);
 
   &:focus-within {
@@ -68,4 +69,12 @@
   font-size: 12px;
   color: var(--color-negative);
   padding-left: 4px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+  display: block;
 }

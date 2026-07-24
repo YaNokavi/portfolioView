@@ -39,6 +39,15 @@ const initialState: PortfolioSchema = {
       price: 59800.0,
       date: "Oct 15, 2026 11:20",
     },
+    {
+      id: "5",
+      type: "sell",
+      asset: "Bitcoin",
+      symbol: "BTC",
+      amount: 0.1,
+      price: 65000.0,
+      date: "Oct 25, 2026 11:20",
+    },
   ],
 };
 
@@ -54,3 +63,4 @@ export const portfolioSlice = createSlice({
 
 export const { actions: portfolioActions } = portfolioSlice;
 export const { reducer: portfolioReducer } = portfolioSlice;
+export const { addTransaction } = portfolioSlice.actions;

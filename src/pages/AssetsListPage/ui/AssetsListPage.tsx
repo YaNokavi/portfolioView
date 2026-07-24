@@ -4,10 +4,16 @@ import { getAssetColor } from "@/shared/config/assetColors";
 import { useSelector } from "react-redux";
 import { useMemo } from "react";
 import * as styles from "./AssetsListPage.module.scss";
+import { Button } from "@/shared/ui/Button";
+import { Plus } from "lucide-react";
+import { useAssetModal } from "@/features/AddAsset/model/useAssetModal";
+import { AddAssetModal } from "@/features/AddAsset/ui/AddAssetModal";
 
 export const AssetListPage = () => {
   const holdings = useSelector(selectPortfolioHoldings);
   const prices = useSelector((state) => state.market.prices);
+
+  const { mode, openAdd, close } = useAssetModal();
 
   const rows = useMemo(() => {
     return Object.values(holdings).map((holding) => {
@@ -46,6 +52,15 @@ export const AssetListPage = () => {
             <h2 className={styles.cardTitle}>Portfolio assets</h2>
             <p className={styles.cardSubtitle}>{rows.length} positions</p>
           </div>
+
+          <Button
+            variant="primary"
+            leftIcon={<Plus size={16} strokeWidth={3.5} />}
+            style={{ padding: 10 }}
+            onClick={openAdd}
+          >
+            Add asset
+          </Button>
         </div>
 
         <div className={styles.tableWrap}>
@@ -109,6 +124,8 @@ export const AssetListPage = () => {
           </table>
         </div>
       </div>
+
+      <AddAssetModal mode={mode} onClose={close} />
     </section>
   );
 };

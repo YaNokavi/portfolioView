@@ -8,3 +8,4 @@ export {
   selectTransactions,
   selectPortfolioHoldings,
 } from "./model/selectors/portfolioSelectors";
+export { addTransaction } from "./model/slice/portfolioSlice";
